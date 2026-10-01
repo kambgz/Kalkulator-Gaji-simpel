@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Penggajian Pegawai</title>
-    <!-- Menggunakan font Inter dari Google Fonts untuk tampilan modern -->
+    <title>Sistem Penggajian Pegawai Lengkap</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -22,236 +21,65 @@
             --border: #E5E7EB;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .header p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            margin-bottom: 20px;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        @media (max-width: 600px) {
-            .grid-2 { grid-template-columns: 1fr; }
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--text-main);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .info-box {
-            background-color: #EEF2FF;
-            border-left: 4px solid var(--primary);
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 15px;
-        }
-
-        .btn {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-        .btn-primary:hover { background-color: var(--primary-hover); }
-
-        .btn-danger {
-            background-color: var(--danger);
-            color: white;
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-        .btn-danger:hover { background-color: var(--danger-hover); }
-
-        .btn-warning {
-            background-color: var(--warning);
-            color: white;
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-        .btn-warning:hover { background-color: #D97706; }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            white-space: nowrap;
-        }
-
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-        }
-
-        th {
-            background-color: #F9FAFB;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        .input-absen {
-            width: 80px;
-            text-align: center;
-        }
-
-        .text-right { text-align: right; }
-        .text-bold { font-weight: 700; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
         
-        .summary-box {
-            background-color: var(--success);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            margin-top: 20px;
-            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
-        }
+        .header { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; text-align: center; gap: 10px; }
+        .header h1 { font-size: 24px; font-weight: 700; color: var(--primary); }
+        .top-actions { display: flex; gap: 10px; }
 
+        .card { background-color: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .card-title { font-size: 18px; font-weight: 600; }
+        
+        .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; transition: 0.2s; }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        .input-inline { width: 60px; padding: 4px 8px; text-align: center; border: 1px solid var(--primary); border-radius: 6px; font-weight: bold; }
+
+        .info-box { background-color: #EEF2FF; border-left: 4px solid var(--primary); padding: 15px; border-radius: 6px; margin-top: 15px; line-height: 1.8; }
+        
+        .btn { padding: 10px 16px; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-secondary { background-color: white; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-secondary:hover { background-color: var(--bg); }
+        .btn-danger { background-color: var(--danger); color: white; padding: 6px 12px; font-size: 12px; }
+        .btn-warning { background-color: var(--warning); color: white; padding: 6px 12px; font-size: 12px; }
+
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+        th { background-color: #F9FAFB; font-weight: 600; color: var(--text-muted); }
+        .input-absen { width: 75px; text-align: center; }
+        
+        /* Fitur Hide Gaji Pokok */
+        .hide-gaji .gaji-val { filter: blur(5px); user-select: none; }
+        .toggle-gaji-btn { background: none; border: none; cursor: pointer; font-size: 14px; margin-left: 8px; }
+
+        .summary-box { background-color: var(--success); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-top: 20px; }
         .summary-box h2 { font-size: 16px; font-weight: 500; margin-bottom: 5px; }
         .summary-box .total-value { font-size: 28px; font-weight: 700; }
 
         /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
         .modal.active { display: flex; }
+        .modal-content { background-color: var(--card-bg); border-radius: 12px; padding: 24px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); }
 
-        .modal-content {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 24px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            animation: modalFadeIn 0.3s ease;
-        }
+        /* Calendar Grid */
+        .calendar-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: bold; margin-bottom: 10px; color: var(--text-muted); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .calendar-day { padding: 15px 5px; border: 1px solid var(--border); border-radius: 6px; text-align: center; cursor: pointer; position: relative; }
+        .calendar-day:hover { background-color: var(--bg); }
+        .calendar-day.sunday { color: var(--danger); background-color: #FEF2F2; }
+        .calendar-day.empty { border: none; cursor: default; background: none; }
+        .absent-badge { position: absolute; bottom: 2px; right: 2px; background-color: var(--danger); color: white; font-size: 10px; padding: 2px 5px; border-radius: 10px; }
 
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: var(--text-muted);
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 30px;
-            color: var(--text-muted);
-        }
+        .check-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .check-item { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; }
+        .check-item input { width: 18px; height: 18px; }
     </style>
 </head>
 <body>
@@ -259,20 +87,32 @@
 <div class="container">
     <div class="header">
         <h1>Sistem Penggajian Pegawai</h1>
-        <p>Hitung gaji berdasarkan hari kerja riil (Kalender) dipotong absen</p>
+        <div class="top-actions">
+            <!-- FITUR 5: IMPORT & EXPORT DATA -->
+            <button class="btn btn-secondary" onclick="exportData()">💾 Export Data</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Import Data</button>
+            <input type="file" id="importFile" accept=".json" style="display: none" onchange="importData(event)">
+        </div>
     </div>
 
     <!-- PENGATURAN BULAN -->
     <div class="card">
-        <div class="card-title" style="margin-bottom: 15px;">1. Pengaturan Periode Gaji</div>
-        <div class="grid-2">
-            <div class="form-group">
-                <label>Pilih Bulan & Tahun</label>
-                <input type="month" id="monthPicker" class="form-control" onchange="updateMonthData()">
-            </div>
+        <div class="card-header" style="margin-bottom: 10px;">
+            <div class="card-title">1. Pengaturan Periode Gaji</div>
+            <!-- FITUR 4: TOMBOL BUKA KALENDER -->
+            <button class="btn btn-primary" onclick="openCalendarModal()" style="background-color: var(--warning);">
+                📅 Kalender Absensi
+            </button>
         </div>
+        <input type="month" id="monthPicker" class="form-control" style="max-width: 200px;" onchange="updateMonthData()">
+        
         <div class="info-box" id="monthInfo">
-            Memuat data bulan...
+            <!-- FITUR 1: EDIT HARI LIBUR & KERJA EFEKTIF (Gambar 1) -->
+            <div style="font-size: 16px; margin-bottom: 5px;"><strong id="infoMonthName">Info Bulan:</strong></div>
+            Total Hari di Kalender: <strong id="lblTotalDays">0</strong> Hari <br>
+            Jumlah Hari Libur / Minggu: 
+            <input type="number" id="valHolidays" class="input-inline" min="0" max="31" onchange="recalculateWorkDays()"> Hari <br>
+            Total Hari Kerja Efektif: <strong id="lblWorkDays" style="color: var(--primary); font-size: 18px;">0</strong> Hari
         </div>
     </div>
 
@@ -280,9 +120,7 @@
     <div class="card">
         <div class="card-header">
             <div class="card-title">2. Daftar Gaji Pegawai</div>
-            <button class="btn btn-primary" onclick="openModal('add')">
-                + Tambah Pegawai
-            </button>
+            <button class="btn btn-primary" onclick="openModal('add')">+ Tambah Pegawai</button>
         </div>
         
         <div class="table-responsive">
@@ -290,21 +128,23 @@
                 <thead>
                     <tr>
                         <th>Nama Pegawai</th>
-                        <th>Gaji Pokok</th>
-                        <th style="width: 150px;">Tidak Masuk (Hari)</th>
-                        <th>Hari Masuk</th>
+                        <!-- FITUR 2: HIDE GAJI POKOK (Gambar 2) -->
+                        <th>Gaji Pokok <button class="toggle-gaji-btn" onclick="toggleGaji()" title="Sembunyikan">👁️</button></th>
+                        <th style="width: 130px;">Tidak Masuk (Hari)</th>
+                        <!-- FITUR 3: INPUT HARI MASUK BISA DIUBAH (Gambar 3) -->
+                        <th style="width: 130px;">Hari Masuk (Hari)</th>
                         <th>Gaji Diterima</th>
                         <th style="text-align: center;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="employeeBody">
-                    <!-- Data akan dirender pakai JS -->
+                    <!-- Data Render JS -->
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- TOTAL KESELURUHAN -->
+    <!-- TOTAL -->
     <div class="summary-box">
         <h2>Total Gaji yang Harus Dibayarkan Bulan Ini:</h2>
         <div class="total-value" id="grandTotal">Rp 0</div>
@@ -316,129 +156,166 @@
     <div class="modal-content">
         <div class="modal-header">
             <h2 class="card-title" id="modalTitle">Tambah Pegawai</h2>
-            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <button class="close-btn" onclick="closeModal('employeeModal')">&times;</button>
         </div>
         <form id="employeeForm" onsubmit="saveEmployee(event)">
             <input type="hidden" id="empId">
-            <div class="form-group">
+            <div style="margin-bottom: 15px;">
                 <label>Nama Pegawai</label>
-                <input type="text" id="empName" class="form-control" placeholder="Contoh: Juliana" required>
+                <input type="text" id="empName" class="form-control" required style="margin-top: 5px;">
             </div>
-            <div class="form-group">
-                <label>Gaji Pokok (Sebulan Full)</label>
-                <input type="number" id="empSalary" class="form-control" placeholder="Contoh: 1700000" required>
+            <div style="margin-bottom: 15px;">
+                <label>Gaji Pokok (Bulan Penuh)</label>
+                <input type="number" id="empSalary" class="form-control" required style="margin-top: 5px;">
             </div>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button type="button" class="btn" style="background: var(--bg); color: var(--text-main); flex: 1;" onclick="closeModal()">Batal</button>
-                <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">Simpan</button>
-            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">Simpan</button>
         </form>
     </div>
 </div>
 
-<script>
-    // --- STATE MANAGEMENT ---
-    let employees = JSON.parse(localStorage.getItem('employees')) || [];
-    let currentWorkDays = 26; // Default
-    let currentTotalDays = 31;
-    let currentSundays = 5;
+<!-- FITUR 4: MODAL KALENDER BULANAN -->
+<div class="modal" id="calendarModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="card-title" id="calendarTitle">Kalender Absensi</h2>
+            <button class="close-btn" onclick="closeModal('calendarModal')">&times;</button>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Klik pada tanggal untuk menandai pegawai yang tidak masuk.</p>
+        <div class="calendar-header">
+            <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+</div>
 
-    // Format Rupiah
-    const formatRupiah = (number) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(number);
+<!-- FITUR 4: MODAL TANDAI ABSEN HARIAN -->
+<div class="modal" id="dayAttendanceModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="card-title">Absensi: <span id="selectedDateTitle"></span></h2>
+            <button class="close-btn" onclick="closeModal('dayAttendanceModal')">&times;</button>
+        </div>
+        <p style="font-size: 14px; margin-bottom: 15px;">Centang nama pegawai yang <b>TIDAK MASUK</b> pada tanggal ini:</p>
+        <div class="check-list" id="attendanceCheckList"></div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="saveDayAttendance()">Simpan Absensi</button>
+    </div>
+</div>
+
+<script>
+    // --- DATABASE & STATE ---
+    let employees = JSON.parse(localStorage.getItem('employees')) || [];
+    let attendanceData = JSON.parse(localStorage.getItem('attendanceData')) || {}; // Format: {"2026-10-05": ["id1", "id2"]}
+    let monthSettings = JSON.parse(localStorage.getItem('monthSettings')) || {};   // Format: {"2026-10": {holidays: 4}}
+    
+    let currentTotalDays = 0;
+    let currentHolidays = 0;
+    let currentWorkDays = 0;
+    let selectedDateForAbsen = "";
+    let isGajiHidden = false;
+
+    const formatRupiah = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number);
+
+    // --- INISIALISASI ---
+    window.onload = () => {
+        const now = new Date();
+        document.getElementById('monthPicker').value = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+        updateMonthData();
     };
 
-    // --- LOGIKA KALENDER ---
+    // --- FITUR 1: LOGIKA KALENDER & HARI LIBUR ---
     function updateMonthData() {
-        const picker = document.getElementById('monthPicker');
-        if (!picker.value) return;
+        const picker = document.getElementById('monthPicker').value;
+        if (!picker) return;
 
-        const dateParts = picker.value.split('-'); // Format: YYYY-MM
-        const year = parseInt(dateParts[0]);
-        const month = parseInt(dateParts[1]); // 1-12
+        const [year, month] = picker.split('-');
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        document.getElementById('infoMonthName').innerText = `Info ${monthNames[parseInt(month)-1]} ${year}:`;
 
-        // Menghitung jumlah hari di bulan tersebut
-        currentTotalDays = new Date(year, month, 0).getDate();
-        
-        // Menghitung jumlah hari Minggu
-        currentSundays = 0;
-        for (let day = 1; day <= currentTotalDays; day++) {
-            const date = new Date(year, month - 1, day);
-            if (date.getDay() === 0) { // 0 = Minggu
-                currentSundays++;
+        currentTotalDays = new Date(year, parseInt(month), 0).getDate();
+        document.getElementById('lblTotalDays').innerText = currentTotalDays;
+
+        // Cek apakah ada settingan libur tersimpan untuk bulan ini
+        if (monthSettings[picker] !== undefined) {
+            currentHolidays = monthSettings[picker].holidays;
+        } else {
+            // Jika tidak ada, hitung otomatis jumlah hari minggu
+            currentHolidays = 0;
+            for (let d = 1; d <= currentTotalDays; d++) {
+                if (new Date(year, month - 1, d).getDay() === 0) currentHolidays++;
             }
         }
 
-        currentWorkDays = currentTotalDays - currentSundays;
+        document.getElementById('valHolidays').value = currentHolidays;
+        recalculateWorkDays();
+    }
 
-        // Update UI Info Box
-        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-        document.getElementById('monthInfo').innerHTML = `
-            <strong>Info ${monthNames[month-1]} ${year}:</strong><br>
-            Total Hari di Kalender: <strong>${currentTotalDays} Hari</strong> <br>
-            Jumlah Hari Minggu (Libur): <strong>${currentSundays} Hari</strong> <br>
-            Total Hari Kerja Efektif: <strong style="color: var(--primary); font-size: 16px;">${currentWorkDays} Hari</strong>
-        `;
+    // Dipanggil saat user mengganti angka di Input "Jumlah Hari Libur" (Fitur 1)
+    function recalculateWorkDays() {
+        let h = parseInt(document.getElementById('valHolidays').value) || 0;
+        if (h < 0) h = 0; if (h > currentTotalDays) h = currentTotalDays;
+        currentHolidays = h;
+        currentWorkDays = currentTotalDays - currentHolidays;
+        
+        document.getElementById('lblWorkDays').innerText = currentWorkDays;
+        
+        // Simpan setting bulan ini
+        const picker = document.getElementById('monthPicker').value;
+        monthSettings[picker] = { holidays: currentHolidays };
+        localStorage.setItem('monthSettings', JSON.stringify(monthSettings));
 
+        // Sinkronkan absen dari kalender ke tabel
+        syncAbsenceFromCalendar();
         renderTable();
     }
 
-    // Set Default Input Bulan ke Bulan Saat Ini
-    function setDefaultMonth() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        document.getElementById('monthPicker').value = `${year}-${month}`;
-        updateMonthData();
+    // --- FITUR 2: HIDE GAJI POKOK ---
+    function toggleGaji() {
+        isGajiHidden = !isGajiHidden;
+        const table = document.getElementById('employeeTable');
+        if (isGajiHidden) {
+            table.classList.add('hide-gaji');
+        } else {
+            table.classList.remove('hide-gaji');
+        }
     }
 
-    // --- LOGIKA PEGAWAI & TABEL ---
+    // --- FITUR 3 & RENDERING TABEL ---
     function renderTable() {
         const tbody = document.getElementById('employeeBody');
         tbody.innerHTML = '';
         let grandTotal = 0;
 
         if (employees.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Belum ada data pegawai. Silakan klik "Tambah Pegawai"</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px;">Belum ada data pegawai.</td></tr>`;
             document.getElementById('grandTotal').innerText = formatRupiah(0);
             return;
         }
 
-        employees.forEach((emp, index) => {
-            // Kita baca nilai input absen dari elemen jika sudah dirender (supaya tidak hilang saat ketik)
-            const inputEl = document.getElementById(`absen-${emp.id}`);
-            let absenDays = inputEl ? parseFloat(inputEl.value) || 0 : (emp.currentAbsen || 0);
-            
-            // Validasi agar absen tidak lebih dari hari kerja
+        employees.forEach(emp => {
+            let absenDays = emp.currentAbsen || 0;
             if (absenDays > currentWorkDays) absenDays = currentWorkDays;
             
-            // Simpan state absen sementara
-            emp.currentAbsen = absenDays;
-
-            const hariMasuk = currentWorkDays - absenDays;
+            let hariMasuk = currentWorkDays - absenDays;
             
-            // RUMUS GAJI: (Gaji Pokok / Total Hari Kerja) * Hari Masuk
-            const gajiPerHari = emp.salary / currentWorkDays;
-            let gajiDiterima = gajiPerHari * hariMasuk;
-            
-            // Membulatkan hasil ke rupiah terdekat
-            gajiDiterima = Math.round(gajiDiterima);
+            let gajiDiterima = 0;
+            if (currentWorkDays > 0) {
+                gajiDiterima = Math.round((emp.salary / currentWorkDays) * hariMasuk);
+            }
             grandTotal += gajiDiterima;
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="text-bold">${emp.name}</td>
-                <td>${formatRupiah(emp.salary)}</td>
+                <td style="font-weight:600;">${emp.name}</td>
+                <td><span class="gaji-val">${formatRupiah(emp.salary)}</span></td>
                 <td>
-                    <input type="number" id="absen-${emp.id}" class="form-control input-absen" min="0" max="${currentWorkDays}" step="0.5" value="${absenDays}" oninput="calculateRow('${emp.id}')">
+                    <!-- Input Tidak Masuk -->
+                    <input type="number" id="absen-${emp.id}" class="form-control input-absen" min="0" max="${currentWorkDays}" step="0.5" value="${absenDays}" oninput="handleAbsenChange('${emp.id}')">
                 </td>
-                <td><span id="masuk-${emp.id}" style="font-weight: 500; color: var(--success);">${hariMasuk} Hari</span></td>
-                <td class="text-bold" id="gaji-${emp.id}" style="color: var(--primary);">${formatRupiah(gajiDiterima)}</td>
+                <td>
+                    <!-- Input Hari Masuk (Fitur 3) -->
+                    <input type="number" id="masuk-${emp.id}" class="form-control input-absen" style="border-color:var(--success); color:var(--success); font-weight:bold;" min="0" max="${currentWorkDays}" step="0.5" value="${hariMasuk}" oninput="handleMasukChange('${emp.id}')">
+                </td>
+                <td style="font-weight:700; color:var(--primary);" id="gaji-${emp.id}">${formatRupiah(gajiDiterima)}</td>
                 <td style="text-align: center;">
                     <button class="btn btn-warning" onclick="openModal('edit', '${emp.id}')">Edit</button>
                     <button class="btn btn-danger" onclick="deleteEmployee('${emp.id}')">Hapus</button>
@@ -450,50 +327,200 @@
         document.getElementById('grandTotal').innerText = formatRupiah(grandTotal);
     }
 
-    // Dipanggil setiap kali user ngetik di kotak "Tidak Masuk"
-    function calculateRow(id) {
-        const emp = employees.find(e => e.id == id);
-        if(!emp) return;
-
-        let absenInput = document.getElementById(`absen-${id}`).value;
-        let absenDays = parseFloat(absenInput) || 0;
+    // Jika input "Tidak Masuk" diketik (Fitur 3)
+    function handleAbsenChange(id) {
+        let absen = parseFloat(document.getElementById(`absen-${id}`).value) || 0;
+        if(absen < 0) absen = 0; if(absen > currentWorkDays) absen = currentWorkDays;
         
-        if (absenDays < 0) absenDays = 0;
-        if (absenDays > currentWorkDays) {
-            absenDays = currentWorkDays;
-            document.getElementById(`absen-${id}`).value = currentWorkDays;
-        }
-
-        emp.currentAbsen = absenDays; // Simpan ke state lokal
-        const hariMasuk = currentWorkDays - absenDays;
-        
-        const gajiPerHari = emp.salary / currentWorkDays;
-        let gajiDiterima = Math.round(gajiPerHari * hariMasuk);
-
-        // Update Text di Baris tersebut
-        document.getElementById(`masuk-${id}`).innerText = `${hariMasuk} Hari`;
-        document.getElementById(`gaji-${id}`).innerText = formatRupiah(gajiDiterima);
-
-        // Update Grand Total Keseluruhan
-        updateGrandTotal();
+        let masuk = currentWorkDays - absen;
+        document.getElementById(`masuk-${id}`).value = masuk; // Update kotak sebelahnya
+        updateSalaryState(id, absen, masuk);
     }
 
-    function updateGrandTotal() {
+    // Jika input "Hari Masuk" diketik (Fitur 3)
+    function handleMasukChange(id) {
+        let masuk = parseFloat(document.getElementById(`masuk-${id}`).value) || 0;
+        if(masuk < 0) masuk = 0; if(masuk > currentWorkDays) masuk = currentWorkDays;
+        
+        let absen = currentWorkDays - masuk;
+        document.getElementById(`absen-${id}`).value = absen; // Update kotak sebelahnya
+        updateSalaryState(id, absen, masuk);
+    }
+
+    function updateSalaryState(id, absen, masuk) {
+        const emp = employees.find(e => e.id == id);
+        if(!emp) return;
+        
+        emp.currentAbsen = absen;
+        let gajiDiterima = 0;
+        if(currentWorkDays > 0) gajiDiterima = Math.round((emp.salary / currentWorkDays) * masuk);
+        
+        document.getElementById(`gaji-${id}`).innerText = formatRupiah(gajiDiterima);
+        recalcTotalOnly();
+    }
+
+    function recalcTotalOnly() {
         let total = 0;
         employees.forEach(emp => {
-            const absenDays = emp.currentAbsen || 0;
-            const hariMasuk = currentWorkDays - absenDays;
-            const gajiPerHari = emp.salary / currentWorkDays;
-            total += Math.round(gajiPerHari * hariMasuk);
+            let absen = emp.currentAbsen || 0;
+            if(absen > currentWorkDays) absen = currentWorkDays;
+            if(currentWorkDays > 0) total += Math.round((emp.salary / currentWorkDays) * (currentWorkDays - absen));
         });
         document.getElementById('grandTotal').innerText = formatRupiah(total);
     }
 
-    // --- CRUD MODAL ---
-    const modal = document.getElementById('employeeModal');
-    
+    // --- FITUR 4: KALENDER ABSENSI ---
+    function openCalendarModal() {
+        const picker = document.getElementById('monthPicker').value;
+        const [year, month] = picker.split('-');
+        document.getElementById('calendarTitle').innerText = `Kalender - ${picker}`;
+        
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+        
+        // Cari hari pertama bulan ini (0 = Minggu)
+        const firstDay = new Date(year, month - 1, 1).getDay();
+        
+        // Tambah kotak kosong di awal bulan
+        for (let i = 0; i < firstDay; i++) {
+            grid.innerHTML += `<div class="calendar-day empty"></div>`;
+        }
+        
+        // Loop tanggal
+        for (let d = 1; d <= currentTotalDays; d++) {
+            const dateStr = `${year}-${month}-${d.toString().padStart(2, '0')}`;
+            const isSunday = new Date(year, month - 1, d).getDay() === 0;
+            
+            let absenCount = (attendanceData[dateStr] || []).length;
+            let badgeHtml = absenCount > 0 ? `<div class="absent-badge">${absenCount} Absen</div>` : '';
+            
+            grid.innerHTML += `
+                <div class="calendar-day ${isSunday ? 'sunday' : ''}" onclick="openDayAttendance('${dateStr}', ${d})">
+                    ${d}
+                    ${badgeHtml}
+                </div>
+            `;
+        }
+        document.getElementById('calendarModal').classList.add('active');
+    }
+
+    function openDayAttendance(dateStr, dayNum) {
+        selectedDateForAbsen = dateStr;
+        document.getElementById('selectedDateTitle').innerText = dateStr;
+        
+        const checkList = document.getElementById('attendanceCheckList');
+        checkList.innerHTML = '';
+        
+        const absentList = attendanceData[dateStr] || [];
+        
+        if (employees.length === 0) {
+            checkList.innerHTML = `<i style="color:var(--text-muted)">Belum ada data pegawai.</i>`;
+        } else {
+            employees.forEach(emp => {
+                const isChecked = absentList.includes(emp.id) ? "checked" : "";
+                checkList.innerHTML += `
+                    <label class="check-item">
+                        <input type="checkbox" value="${emp.id}" id="chk-${emp.id}" ${isChecked}>
+                        <span>${emp.name}</span>
+                    </label>
+                `;
+            });
+        }
+        
+        document.getElementById('dayAttendanceModal').classList.add('active');
+    }
+
+    function saveDayAttendance() {
+        const checkedBoxes = document.querySelectorAll('#attendanceCheckList input[type="checkbox"]:checked');
+        const absentIds = Array.from(checkedBoxes).map(cb => cb.value);
+        
+        if (absentIds.length > 0) {
+            attendanceData[selectedDateForAbsen] = absentIds;
+        } else {
+            delete attendanceData[selectedDateForAbsen]; // Bersihkan jika tidak ada yg absen
+        }
+        
+        localStorage.setItem('attendanceData', JSON.stringify(attendanceData));
+        
+        closeModal('dayAttendanceModal');
+        openCalendarModal(); // Refresh kalender
+        syncAbsenceFromCalendar(); // Hitung ulang tabel utama
+    }
+
+    // Menghitung total hari tidak masuk setiap pegawai berdasarkan kalender untuk bulan aktif
+    function syncAbsenceFromCalendar() {
+        const picker = document.getElementById('monthPicker').value; // YYYY-MM
+        
+        // Reset absen pegawai untuk bulan ini di tabel
+        employees.forEach(emp => emp.currentAbsen = 0);
+        
+        // Loop semua data absen yang tersimpan
+        for (const dateStr in attendanceData) {
+            if (dateStr.startsWith(picker)) {
+                // Jika tanggal ada di bulan yang dipilih
+                const absents = attendanceData[dateStr];
+                absents.forEach(empId => {
+                    const emp = employees.find(e => e.id == empId);
+                    if (emp) emp.currentAbsen += 1;
+                });
+            }
+        }
+        renderTable();
+    }
+
+
+    // --- FITUR 5: IMPORT & EXPORT DATA ---
+    function exportData() {
+        const backupData = {
+            employees: employees,
+            attendanceData: attendanceData,
+            monthSettings: monthSettings
+        };
+        const dataStr = JSON.stringify(backupData, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Backup_Gaji_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.employees) {
+                    employees = data.employees;
+                    localStorage.setItem('employees', JSON.stringify(employees));
+                }
+                if (data.attendanceData) {
+                    attendanceData = data.attendanceData;
+                    localStorage.setItem('attendanceData', JSON.stringify(attendanceData));
+                }
+                if (data.monthSettings) {
+                    monthSettings = data.monthSettings;
+                    localStorage.setItem('monthSettings', JSON.stringify(monthSettings));
+                }
+                alert("Data berhasil di-import!");
+                updateMonthData(); // Refresh UI
+            } catch (err) {
+                alert("File tidak valid atau rusak!");
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = ''; // Reset input
+    }
+
+
+    // --- CRUD PEGAWAI (MODAL UTAMA) ---
     function openModal(mode, id = null) {
-        modal.classList.add('active');
+        document.getElementById('employeeModal').classList.add('active');
         document.getElementById('employeeForm').reset();
         
         if (mode === 'add') {
@@ -508,8 +535,8 @@
         }
     }
 
-    function closeModal() {
-        modal.classList.remove('active');
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
     }
 
     function saveEmployee(e) {
@@ -519,23 +546,14 @@
         const salary = parseFloat(document.getElementById('empSalary').value);
 
         if (id) {
-            // Edit
             const index = employees.findIndex(e => e.id == id);
             employees[index].name = name;
             employees[index].salary = salary;
         } else {
-            // Tambah Baru
-            employees.push({
-                id: Date.now().toString(),
-                name: name,
-                salary: salary,
-                currentAbsen: 0
-            });
+            employees.push({ id: Date.now().toString(), name: name, salary: salary, currentAbsen: 0 });
         }
-
-        // Simpan ke LocalStorage agar tidak hilang saat direfresh
         localStorage.setItem('employees', JSON.stringify(employees));
-        closeModal();
+        closeModal('employeeModal');
         renderTable();
     }
 
@@ -546,11 +564,6 @@
             renderTable();
         }
     }
-
-    // --- INISIALISASI ---
-    window.onload = () => {
-        setDefaultMonth();
-    };
 </script>
 
 </body>
