@@ -398,4 +398,170 @@
         document.getElementById('calendarModal').classList.add('active');
     }
 
-    function openDayAttendan
+function openDayAttendance(dateStr, dayNum) {
+        selectedDateForAbsen = dateStr;
+        document.getElementById('selectedDateTitle').innerText = dateStr;
+        
+        const checkList = document.getElementById('attendanceCheckList');
+        checkList.innerHTML = '';
+        
+        let dailyData = attendanceData[dateStr] || {};
+        
+        // Migrasi jika masih format array dari versi sebelumnya
+        if (Array.isArray(dailyData)) {
+            let converted = {};
+            dailyData.forEach(id => converted[id] = 1);
+            dailyData = converted;
+        }
+        
+        if (employees.length === 0) {
+            checkList.innerHTML = `<i style="color:var(--text-muted)">Belum ada data pegawai.</i>`;
+        } else {
+            employees.forEach(emp => {
+                let currentVal = dailyData[emp.id] || 0; // default 0 (Hadir)
+                
+                checkList.innerHTML += `
+                    <div class="check-item">
+                        <span>${emp.name}</span>
+                        <select class="select-absen day-absen-input" data-id="${emp.id}">
+                            <option value="0" style="color:var(--success)" ${currentVal == 0 ? 'selected' : ''}>Hadir</option>
+                            <option value="0.5" style="color:var(--warning)" ${currentVal == 0.5 ? 'selected' : ''}>Absen ½ Hari</option>
+                            <option value="1" style="color:var(--danger)" ${currentVal == 1 ? 'selected' : ''}>Absen 1 Hari</option>
+                        </select>
+                    </div>
+                `;
+            });
+        }
+        
+        document.getElementById('dayAttendanceModal').classList.add('active');
+    }
+
+    function saveDayAttendance() {
+        const selects = document.querySelectorAll('.day-absen-input');
+        let newDailyData = {};
+        
+        selects.forEach(sel => {
+            let val = parseFloat(sel.value);
+            if (val > 0) {
+                newDailyData[sel.getAttribute('data-id')] = val;
+            }
+        });
+        
+        if (Object.keys(newDailyData).length > 0) {
+            attendanceData[selectedDateForAbsen] = newDailyData;
+        } else {
+            delete attendanceData[selectedDateForAbsen];
+        }
+        
+        localStorage.setItem('attendanceData', JSON.stringify(attendanceData));
+        
+        closeModal('dayAttendanceModal');
+        openCalendarModal(); 
+        syncAbsenceFromCalendar(); 
+    }
+
+    function syncAbsenceFromCalendar() {
+        const picker = document.getElementById('monthPicker').value; 
+        
+        employees.forEach(emp => emp.currentAbsen = 0);
+        
+        for (const dateStr in attendanceData) {
+            if (dateStr.startsWith(picker)) {
+                let dailyData = attendanceData[dateStr];
+                
+                // Antisipasi format lama (array)
+                if (Array.isArray(dailyData)) {
+                    dailyData.forEach(empId => {
+                        const emp = employees.find(e => e.id == empId);
+                        if (emp) emp.currentAbsen += 1;
+                    });
+                } else {
+                    // Format baru (object dengan value 0.5 atau 1)
+                    for (const empId in dailyData) {
+                        const emp = employees.find(e => e.id == empId);
+                        if (emp) emp.currentAbsen += dailyData[empId];
+                    }
+                }
+            }
+        }
+        renderTable();
+    }
+
+    // --- CRUD ---
+    function exportData() {
+        const backupData = { employees: employees, attendanceData: attendanceData, monthSettings: monthSettings };
+        const dataStr = JSON.stringify(backupData, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Backup_Gaji_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.employees) { employees = data.employees; localStorage.setItem('employees', JSON.stringify(employees)); }
+                if (data.attendanceData) { attendanceData = data.attendanceData; localStorage.setItem('attendanceData', JSON.stringify(attendanceData)); }
+                if (data.monthSettings) { monthSettings = data.monthSettings; localStorage.setItem('monthSettings', JSON.stringify(monthSettings)); }
+                alert("Data berhasil di-import!");
+                updateMonthData(); 
+            } catch (err) { alert("File tidak valid atau rusak!"); }
+        };
+        reader.readAsText(file);
+        event.target.value = ''; 
+    }
+
+    function openModal(mode, id = null) {
+        document.getElementById('employeeModal').classList.add('active');
+        document.getElementById('employeeForm').reset();
+        
+        if (mode === 'add') {
+            document.getElementById('modalTitle').innerText = 'Tambah Pegawai';
+            document.getElementById('empId').value = '';
+        } else {
+            document.getElementById('modalTitle').innerText = 'Edit Pegawai';
+            const emp = employees.find(e => e.id == id);
+            document.getElementById('empId').value = emp.id;
+            document.getElementById('empName').value = emp.name;
+            document.getElementById('empSalary').value = emp.salary;
+        }
+    }
+
+    function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+
+    function saveEmployee(e) {
+        e.preventDefault();
+        const id = document.getElementById('empId').value;
+        const name = document.getElementById('empName').value;
+        const salary = parseFloat(document.getElementById('empSalary').value);
+
+        if (id) {
+            const index = employees.findIndex(e => e.id == id);
+            employees[index].name = name;
+            employees[index].salary = salary;
+        } else {
+            employees.push({ id: Date.now().toString(), name: name, salary: salary, currentAbsen: 0 });
+        }
+        localStorage.setItem('employees', JSON.stringify(employees));
+        closeModal('employeeModal');
+        renderTable();
+    }
+
+    function deleteEmployee(id) {
+        if (confirm('Yakin ingin menghapus pegawai ini?')) {
+            employees = employees.filter(e => e.id != id);
+            localStorage.setItem('employees', JSON.stringify(employees));
+            renderTable();
+        }
+    }
+</script>
+
+</body>
+</html>
