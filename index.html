@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Penggajian Pegawai</title>
+    <!-- Menggunakan font Inter dari Google Fonts untuk tampilan modern -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --danger: #EF4444;
+            --danger-hover: #DC2626;
+            --warning: #F59E0B;
+            --success: #10B981;
+            --bg: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .info-box {
+            background-color: #EEF2FF;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .btn-danger:hover { background-color: var(--danger-hover); }
+
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .btn-warning:hover { background-color: #D97706; }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #F9FAFB;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .input-absen {
+            width: 80px;
+            text-align: center;
+        }
+
+        .text-right { text-align: right; }
+        .text-bold { font-weight: 700; }
+        
+        .summary-box {
+            background-color: var(--success);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+        }
+
+        .summary-box h2 { font-size: 16px; font-weight: 500; margin-bottom: 5px; }
+        .summary-box .total-value { font-size: 28px; font-weight: 700; }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Sistem Penggajian Pegawai</h1>
+        <p>Hitung gaji berdasarkan hari kerja riil (Kalender) dipotong absen</p>
+    </div>
+
+    <!-- PENGATURAN BULAN -->
+    <div class="card">
+        <div class="card-title" style="margin-bottom: 15px;">1. Pengaturan Periode Gaji</div>
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Pilih Bulan & Tahun</label>
+                <input type="month" id="monthPicker" class="form-control" onchange="updateMonthData()">
+            </div>
+        </div>
+        <div class="info-box" id="monthInfo">
+            Memuat data bulan...
+        </div>
+    </div>
+
+    <!-- TABEL PEGAWAI -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">2. Daftar Gaji Pegawai</div>
+            <button class="btn btn-primary" onclick="openModal('add')">
+                + Tambah Pegawai
+            </button>
+        </div>
+        
+        <div class="table-responsive">
+            <table id="employeeTable">
+                <thead>
+                    <tr>
+                        <th>Nama Pegawai</th>
+                        <th>Gaji Pokok</th>
+                        <th style="width: 150px;">Tidak Masuk (Hari)</th>
+                        <th>Hari Masuk</th>
+                        <th>Gaji Diterima</th>
+                        <th style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeBody">
+                    <!-- Data akan dirender pakai JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TOTAL KESELURUHAN -->
+    <div class="summary-box">
+        <h2>Total Gaji yang Harus Dibayarkan Bulan Ini:</h2>
+        <div class="total-value" id="grandTotal">Rp 0</div>
+    </div>
+</div>
+
+<!-- MODAL TAMBAH/EDIT PEGAWAI -->
+<div class="modal" id="employeeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="card-title" id="modalTitle">Tambah Pegawai</h2>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <form id="employeeForm" onsubmit="saveEmployee(event)">
+            <input type="hidden" id="empId">
+            <div class="form-group">
+                <label>Nama Pegawai</label>
+                <input type="text" id="empName" class="form-control" placeholder="Contoh: Juliana" required>
+            </div>
+            <div class="form-group">
+                <label>Gaji Pokok (Sebulan Full)</label>
+                <input type="number" id="empSalary" class="form-control" placeholder="Contoh: 1700000" required>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn" style="background: var(--bg); color: var(--text-main); flex: 1;" onclick="closeModal()">Batal</button>
+                <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // --- STATE MANAGEMENT ---
+    let employees = JSON.parse(localStorage.getItem('employees')) || [];
+    let currentWorkDays = 26; // Default
+    let currentTotalDays = 31;
+    let currentSundays = 5;
+
+    // Format Rupiah
+    const formatRupiah = (number) => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(number);
+    };
+
+    // --- LOGIKA KALENDER ---
+    function updateMonthData() {
+        const picker = document.getElementById('monthPicker');
+        if (!picker.value) return;
+
+        const dateParts = picker.value.split('-'); // Format: YYYY-MM
+        const year = parseInt(dateParts[0]);
+        const month = parseInt(dateParts[1]); // 1-12
+
+        // Menghitung jumlah hari di bulan tersebut
+        currentTotalDays = new Date(year, month, 0).getDate();
+        
+        // Menghitung jumlah hari Minggu
+        currentSundays = 0;
+        for (let day = 1; day <= currentTotalDays; day++) {
+            const date = new Date(year, month - 1, day);
+            if (date.getDay() === 0) { // 0 = Minggu
+                currentSundays++;
+            }
+        }
+
+        currentWorkDays = currentTotalDays - currentSundays;
+
+        // Update UI Info Box
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        document.getElementById('monthInfo').innerHTML = `
+            <strong>Info ${monthNames[month-1]} ${year}:</strong><br>
+            Total Hari di Kalender: <strong>${currentTotalDays} Hari</strong> <br>
+            Jumlah Hari Minggu (Libur): <strong>${currentSundays} Hari</strong> <br>
+            Total Hari Kerja Efektif: <strong style="color: var(--primary); font-size: 16px;">${currentWorkDays} Hari</strong>
+        `;
+
+        renderTable();
+    }
+
+    // Set Default Input Bulan ke Bulan Saat Ini
+    function setDefaultMonth() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        document.getElementById('monthPicker').value = `${year}-${month}`;
+        updateMonthData();
+    }
+
+    // --- LOGIKA PEGAWAI & TABEL ---
+    function renderTable() {
+        const tbody = document.getElementById('employeeBody');
+        tbody.innerHTML = '';
+        let grandTotal = 0;
+
+        if (employees.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Belum ada data pegawai. Silakan klik "Tambah Pegawai"</td></tr>`;
+            document.getElementById('grandTotal').innerText = formatRupiah(0);
+            return;
+        }
+
+        employees.forEach((emp, index) => {
+            // Kita baca nilai input absen dari elemen jika sudah dirender (supaya tidak hilang saat ketik)
+            const inputEl = document.getElementById(`absen-${emp.id}`);
+            let absenDays = inputEl ? parseFloat(inputEl.value) || 0 : (emp.currentAbsen || 0);
+            
+            // Validasi agar absen tidak lebih dari hari kerja
+            if (absenDays > currentWorkDays) absenDays = currentWorkDays;
+            
+            // Simpan state absen sementara
+            emp.currentAbsen = absenDays;
+
+            const hariMasuk = currentWorkDays - absenDays;
+            
+            // RUMUS GAJI: (Gaji Pokok / Total Hari Kerja) * Hari Masuk
+            const gajiPerHari = emp.salary / currentWorkDays;
+            let gajiDiterima = gajiPerHari * hariMasuk;
+            
+            // Membulatkan hasil ke rupiah terdekat
+            gajiDiterima = Math.round(gajiDiterima);
+            grandTotal += gajiDiterima;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="text-bold">${emp.name}</td>
+                <td>${formatRupiah(emp.salary)}</td>
+                <td>
+                    <input type="number" id="absen-${emp.id}" class="form-control input-absen" min="0" max="${currentWorkDays}" step="0.5" value="${absenDays}" oninput="calculateRow('${emp.id}')">
+                </td>
+                <td><span id="masuk-${emp.id}" style="font-weight: 500; color: var(--success);">${hariMasuk} Hari</span></td>
+                <td class="text-bold" id="gaji-${emp.id}" style="color: var(--primary);">${formatRupiah(gajiDiterima)}</td>
+                <td style="text-align: center;">
+                    <button class="btn btn-warning" onclick="openModal('edit', '${emp.id}')">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteEmployee('${emp.id}')">Hapus</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('grandTotal').innerText = formatRupiah(grandTotal);
+    }
+
+    // Dipanggil setiap kali user ngetik di kotak "Tidak Masuk"
+    function calculateRow(id) {
+        const emp = employees.find(e => e.id == id);
+        if(!emp) return;
+
+        let absenInput = document.getElementById(`absen-${id}`).value;
+        let absenDays = parseFloat(absenInput) || 0;
+        
+        if (absenDays < 0) absenDays = 0;
+        if (absenDays > currentWorkDays) {
+            absenDays = currentWorkDays;
+            document.getElementById(`absen-${id}`).value = currentWorkDays;
+        }
+
+        emp.currentAbsen = absenDays; // Simpan ke state lokal
+        const hariMasuk = currentWorkDays - absenDays;
+        
+        const gajiPerHari = emp.salary / currentWorkDays;
+        let gajiDiterima = Math.round(gajiPerHari * hariMasuk);
+
+        // Update Text di Baris tersebut
+        document.getElementById(`masuk-${id}`).innerText = `${hariMasuk} Hari`;
+        document.getElementById(`gaji-${id}`).innerText = formatRupiah(gajiDiterima);
+
+        // Update Grand Total Keseluruhan
+        updateGrandTotal();
+    }
+
+    function updateGrandTotal() {
+        let total = 0;
+        employees.forEach(emp => {
+            const absenDays = emp.currentAbsen || 0;
+            const hariMasuk = currentWorkDays - absenDays;
+            const gajiPerHari = emp.salary / currentWorkDays;
+            total += Math.round(gajiPerHari * hariMasuk);
+        });
+        document.getElementById('grandTotal').innerText = formatRupiah(total);
+    }
+
+    // --- CRUD MODAL ---
+    const modal = document.getElementById('employeeModal');
+    
+    function openModal(mode, id = null) {
+        modal.classList.add('active');
+        document.getElementById('employeeForm').reset();
+        
+        if (mode === 'add') {
+            document.getElementById('modalTitle').innerText = 'Tambah Pegawai';
+            document.getElementById('empId').value = '';
+        } else {
+            document.getElementById('modalTitle').innerText = 'Edit Pegawai';
+            const emp = employees.find(e => e.id == id);
+            document.getElementById('empId').value = emp.id;
+            document.getElementById('empName').value = emp.name;
+            document.getElementById('empSalary').value = emp.salary;
+        }
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+    }
+
+    function saveEmployee(e) {
+        e.preventDefault();
+        const id = document.getElementById('empId').value;
+        const name = document.getElementById('empName').value;
+        const salary = parseFloat(document.getElementById('empSalary').value);
+
+        if (id) {
+            // Edit
+            const index = employees.findIndex(e => e.id == id);
+            employees[index].name = name;
+            employees[index].salary = salary;
+        } else {
+            // Tambah Baru
+            employees.push({
+                id: Date.now().toString(),
+                name: name,
+                salary: salary,
+                currentAbsen: 0
+            });
+        }
+
+        // Simpan ke LocalStorage agar tidak hilang saat direfresh
+        localStorage.setItem('employees', JSON.stringify(employees));
+        closeModal();
+        renderTable();
+    }
+
+    function deleteEmployee(id) {
+        if (confirm('Yakin ingin menghapus pegawai ini?')) {
+            employees = employees.filter(e => e.id != id);
+            localStorage.setItem('employees', JSON.stringify(employees));
+            renderTable();
+        }
+    }
+
+    // --- INISIALISASI ---
+    window.onload = () => {
+        setDefaultMonth();
+    };
+</script>
+
+</body>
+</html>
