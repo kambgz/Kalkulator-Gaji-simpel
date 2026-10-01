@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Penggajian Pegawai Lengkap (Cloud)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --danger: #EF4444;
+            --danger-hover: #DC2626;
+            --warning: #F59E0B;
+            --success: #10B981;
+            --success-hover: #059669;
+            --info: #0EA5E9;
+            --bg: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        .header { display: flex; flex-direction: column; align-items: center; margin-bottom: 25px; text-align: center; gap: 10px; }
+        .header h1 { font-size: 24px; font-weight: 700; color: var(--primary); }
+        
+        .top-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+
+        .card { background-color: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .card-title { font-size: 18px; font-weight: 600; }
+        
+        .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; transition: 0.2s; }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        .form-control:disabled { background-color: #F3F4F6; cursor: not-allowed; }
+        .input-inline { width: 60px; padding: 4px 8px; text-align: center; border: 1px solid var(--primary); border-radius: 6px; font-weight: bold; }
+
+        .info-box { background-color: #EEF2FF; border-left: 4px solid var(--primary); padding: 15px; border-radius: 6px; margin-top: 15px; line-height: 1.8; }
+        
+        .btn { padding: 10px 16px; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-secondary { background-color: white; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-secondary:hover { background-color: var(--bg); }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-success:hover { background-color: var(--success-hover); }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-danger:hover { background-color: var(--danger-hover); }
+        .btn-warning { background-color: var(--warning); color: white; }
+        .btn-info { background-color: var(--info); color: white; }
+
+        .btn-block-large { width: 100%; padding: 15px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2); margin-bottom: 20px; }
+
+        .mode-switch { display: flex; background: var(--border); border-radius: 8px; overflow: hidden; width: fit-content; margin-bottom: 15px;}
+        .mode-btn { padding: 8px 14px; border: none; background: transparent; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--text-muted); transition: 0.3s; outline: none;}
+        .mode-btn.active { background: var(--primary); color: white; }
+
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+        th { background-color: #F9FAFB; font-weight: 600; color: var(--text-muted); }
+        .input-absen { width: 75px; text-align: center; }
+        
+        .hide-gaji .gaji-val { filter: blur(5px); user-select: none; }
+        .toggle-gaji-btn { background: none; border: none; cursor: pointer; font-size: 14px; margin-left: 8px; }
+
+        .badge { font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 600; display: inline-block; margin-top: 4px; }
+        .badge-bulanan { background-color: #E0E7FF; color: #4338CA; }
+        .badge-harian { background-color: #FEF3C7; color: #D97706; }
+        .badge-saldo { background-color: #D1FAE5; color: var(--success-hover); margin-top: 6px; display: block; width: fit-content; }
+
+        .summary-box { background-color: var(--success); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-top: 20px; }
+        .summary-box h2 { font-size: 16px; font-weight: 500; margin-bottom: 5px; }
+        .summary-box .total-value { font-size: 28px; font-weight: 700; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-content { background-color: var(--card-bg); border-radius: 12px; padding: 24px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); }
+
+        .calendar-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: bold; margin-bottom: 10px; color: var(--text-muted); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .calendar-day { padding: 15px 5px; border: 1px solid var(--border); border-radius: 6px; text-align: center; cursor: pointer; position: relative; }
+        .calendar-day:hover { background-color: var(--bg); }
+        .calendar-day.sunday { color: var(--danger); background-color: #FEF2F2; }
+        .calendar-day.empty { border: none; cursor: default; background: none; }
+        .absent-badge { position: absolute; bottom: 2px; right: 2px; background-color: var(--danger); color: white; font-size: 10px; padding: 2px 5px; border-radius: 10px; }
+
+        .check-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .check-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; background-color: #FAFAFA; }
+        .check-item span { font-weight: 500; font-size: 15px; }
+        .select-absen { width: auto; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 14px; background-color: white; cursor: pointer; outline: none; }
+        
+        .radio-group { display: flex; gap: 15px; margin-top: 5px; }
+        .radio-label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px; }
+        
+        .footer-copyright { text-align: center; margin-top: 40px; padding-bottom: 20px; color: var(--text-muted); font-size: 14px; }
+
+        /* LOADER & CLOUD SYNC UI */
+        .loader-wrapper { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; }
+        .spinner { width: 50px; height: 50px; border: 4px solid var(--border); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .cloud-status { position: fixed; bottom: 20px; right: 20px; background: white; padding: 10px 16px; border-radius: 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); font-size: 13px; font-weight: 600; z-index: 1000; border: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+        .sync-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--success); transition: 0.3s; }
+    </style>
+</head>
+<body>
+
+<!-- LOADING SCREEN UTAMA -->
+<div class="loader-wrapper" id="mainLoader">
+    <div class="spinner"></div>
+    <h3 style="margin-top:20px; color:var(--primary); font-weight: 600;">Menghubungkan ke Cloud...</h3>
+    <p style="color:var(--text-muted); font-size: 14px; margin-top: 5px;">Mengambil data gaji terbaru</p>
+</div>
+
+<!-- INDIKATOR CLOUD SYNC (Pojok Kanan Bawah) -->
+<div class="cloud-status" id="cloudStatus">
+    <div class="sync-dot" id="syncDot"></div>
+    <span id="syncText">Data Tersinkronisasi</span>
+</div>
+
+<div class="container" id="adminView" style="display: none;">
+    <div class="header">
+        <h1>Sistem Penggajian Pegawai</h1>
+        
+        <div class="top-actions">
+            <button class="btn btn-secondary" onclick="exportData()">💾 Export JSON</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Import JSON</button>
+            <input type="file" id="importFile" accept=".json" style="display: none" onchange="importData(event)">
+        </div>
+    </div>
+
+    <!-- TOMBOL TAMBAH PEGAWAI BESAR -->
+    <button class="btn btn-primary btn-block-large" onclick="openModal('add')">
+        + Tambah Pegawai Baru
+    </button>
+
+    <!-- PENGATURAN PERIODE GAJI -->
+    <div class="card">
+        <div class="card-header" style="margin-bottom: 10px;">
+            <div class="card-title">Pengaturan Periode Gaji</div>
+            
+            <button class="btn btn-primary" id="btnOpenCalendar" onclick="openCalendarModal()" style="background-color: var(--warning); display: none;">
+                📅 Buka Kalender Absensi
+            </button>
+        </div>
+
+        <div>
+            <label style="font-size: 13px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 5px;">Pilih Sumber Data Absensi:</label>
+            <div class="mode-switch">
+                <button class="mode-btn active" id="btnModeManual" onclick="setMode('manual')">✍️ Input Manual</button>
+                <button class="mode-btn" id="btnModeCalendar" onclick="setMode('calendar')">📅 Mode Kalender</button>
+            </div>
+        </div>
+
+        <input type="month" id="monthPicker" class="form-control" style="max-width: 200px;" onchange="updateMonthData()">
+        
+        <div class="info-box" id="monthInfo">
+            <div style="font-size: 16px; margin-bottom: 5px;"><strong id="infoMonthName">Info Bulan:</strong></div>
+            Total Hari di Kalender: <strong id="lblTotalDays">0</strong> Hari <br>
+            Jumlah Hari Libur / Minggu: 
+            <input type="number" id="valHolidays" class="input-inline" min="0" max="31" onchange="recalculateWorkDays()"> Hari <br>
+            Total Hari Kerja Efektif: <strong id="lblWorkDays" style="color: var(--primary); font-size: 18px;">0</strong> Hari
+        </div>
+    </div>
+
+    <!-- DAFTAR GAJI PEGAWAI -->
+    <div class="card">
+        <div class="card-header" style="margin-bottom: 5px;">
+            <div class="card-title">Daftar Gaji Pegawai</div>
+        </div>
+        
+        <div class="table-responsive">
+            <table id="employeeTable">
+                <thead>
+                    <tr>
+                        <th>Nama Pegawai</th>
+                        <th>Gaji / Tarif <button class="toggle-gaji-btn" onclick="toggleGaji()" title="Sembunyikan">👁️</button></th>
+                        <th style="width: 100px;">Tidak Masuk</th>
+                        <th style="width: 100px;">Hari Masuk</th>
+                        <th>Gaji Diterima</th>
+                        <th style="text-align: center; width: 200px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeBody">
+                    <!-- Data Render JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TOTAL GAJI -->
+    <div class="summary-box">
+        <h2>Total Gaji yang Harus Dibayarkan Bulan Ini:</h2>
+        <div class="total-value" id="grandTotal">Rp 0</div>
+    </div>
+</div>
+
+<!-- PORTAL KHUSUS KARYAWAN (DIBUKA VIA LINK STANDALONE) -->
+<div class="container" id="portalView" style="display: none;">
+    <div class="header">
+        <h1>Portal Mandiri Karyawan</h1>
+        <p style="color: var(--text-muted); font-size: 14px;">Ringkasan Data & Keuangan Anda</p>
+    </div>
+
+    <div class="card" style="border-top: 4px solid var(--primary);">
+        <div class="card-header">
+            <div class="card-title" id="portalEmpName">Nama Karyawan</div>
+            <span class="badge" id="portalEmpTypeBadge">Bulanan</span>
+        </div>
+        
+        <div style="margin-top: 15px; padding: 12px; background: var(--bg); border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+            <strong style="font-size: 14px;">Pilih Bulan:</strong>
+            <input type="month" id="portalMonthPicker" class="form-control" style="width: auto; padding: 6px 10px;" onchange="renderPortalData()">
+        </div>
+
+        <div style="display: grid; gap: 12px; font-size: 15px; margin-top: 15px;">
+            <div>✅ Hari Masuk Kerja: <strong id="portalWorkDays"></strong></div>
+            <div>💰 Estimasi Gaji Bersih: <strong id="portalNetSalary" style="color: var(--primary);"></strong></div>
+            <div style="background: #ECFDF5; padding: 12px; border-radius: 8px; border: 1px solid #A7F3D0; margin-top: 5px;">
+                💳 Saldo Tabungan Uang Makan Saat Ini: <strong id="portalMealBalance" style="color: var(--success); font-size: 18px;"></strong>
+            </div>
+            <div style="background: #FEF3C7; padding: 12px; border-radius: 8px; border: 1px solid #FCD34D; margin-top: 5px;">
+                💸 Total Kasbon / Ambil Gaji Bulan Ini: <strong id="portalKasbonTotal" style="color: #D97706; font-size: 18px;"></strong>
+            </div>
+        </div>
+
+        <div style="margin-top: 25px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-warning" style="flex: 1; padding: 12px;" onclick="openPortalKasbonModal()">💸 Ajukan Kasbon / Ambil Gaji</button>
+            <button class="btn btn-secondary" onclick="window.location.reload()">🔄 Refresh Data</button>
+        </div>
+    </div>
+</div>
+
+<div class="footer-copyright">
+    Copyright &copy; <span id="currentYear"></span> by <strong>kam_bgz</strong>. All rights reserved.
+</div>
+
+<!-- MODAL TAMBAH/EDIT PEGAWAI -->
+<div class="modal" id="employeeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="card-title" id="modalTitle">Tambah Pegawai</h2>
+            <button class="close-btn" onclick="closeModal('employeeModal')">&times;</button>
+        </div>
+        <form id="employeeForm" onsubmit="saveEmployee(event)">
+            <input type="hidden" id="empId">
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: 500; font-size: 14px;">Nama Pegawai</label>
+                <input type="text" id="empName" class="form-control" required style="margin-top: 5px;">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: 500; font-size: 14px;">Tipe Gaji</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="empType" value="bulanan" checked onchange="updateSalaryLabel()"> Bulanan
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="empType" value="harian" onchange="updateSalaryLabel()"> Harian
+                    </label>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label id="labelGajiPokok" style="font-weight: 500; font-size: 14px;">Gaji Pokok (Bulan Penuh)</label>
+                <input type="number" id="empSalary" class="form-control" required style="margin-top: 5px;">
+            </div>
+
+            <div style="margin-bottom: 15px; background: #F9FAFB; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                <label style="font-weight: 600; font-size: 14px; color: var(--success-hover);">Pengaturan Tabungan Makan</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                    <div>
+                        <label style="font-size: 12px; color: var(--text-muted);">Mulai Nabung</label>
+                        <input type="date" id="empMealStart" class="form-control" required style="border-color: #A7F3D0; font-size: 13px;">
+                    </div>
+                    <div>
+                        <label style="font-size: 12px; color: var(--text-muted);">Selesai Nabung</label>
+                        <input type="date" id="empMealEnd" class="form-control" required style="border-color: #A7F3D0; font-size: 13px;">
+                    </div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <label style="font-size: 12px; color: var(--text-muted);">Jatah Uang Makan / Hari</label>
+                    <input type="number" id="empMealRate" class="form-control" required style="border-color: #A7F3D0;" value="0">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Simpan</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL KELOLA TABUNGAN MAKAN -->
+<div class="modal" id="mealWithdrawModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="card-title">Tarik Tabungan Makan</h2>
+            <button class="close-btn" onclick="closeModal('mealWithdrawModal')">&times;</button>
+        </div>
+        <div style="text-align: center; margin-bottom: 25px; padding: 15px; background: #ECFDF5; border-radius: 8px; border: 1px solid #A7F3D0;">
+            <p style="font-size: 13px; color: var(--success-hover); font-weight: 600;">Total Saldo Terkumpul</p>
+            <h3 id="modalMealBalance" style="font-size: 28px; color: var(--success); margin-top: 5px;">Rp 0</h3>
+        </div>
+        <form id="mealWithdrawForm" onsubmit="processMealWithdraw(event)">
+            <input type="hidden" id="mealWithdrawEmpId">
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: 500; font-size: 14px;">Nominal Penarikan (Rp)</label>
+                <input type="number" id="mealWithdrawAmount" class="form-control" required style="margin-top: 5px;" min="1">
+            </div>
+            <button type="submit" id="btnWithdrawSubmit" class="btn btn-success" style="width: 100%; margin-top: 10px; font-weight: 600; padding: 12px;">💳 Cairkan Dana</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL PENGATURAN KASBON -->
+<div class="modal" id="kasbonModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="card-title">Kelola Kasbon Karyawan</h2>
+            <button class="close-btn" onclick="closeModal('kasbonModal')">&times;</button>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Daftar kasbon untuk <strong id="kasbonEmpName"></strong> bulan ini:</p>
+        <div id="kasbonListContainer" style="margin-bottom: 20px; max-height: 150px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; padding: 8px; background: #F9FAFB;"></div>
+        <form onsubmit="saveKasbonAdmin(event)">
+            <input type="hidden" id="kasbonEmpId">
+            <div style="margin-bottom: 12px;">
+                <label style="font-weight: 500; font-size: 14px;">Tambah Kasbon Baru (Rp)</label>
+                <input type="number" id="kasbonAmountInput" class="form-control" style="margin-top: 5px;" min="1" placeholder="Nominal...">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: 500; font-size: 14px;">Keterangan / Keperluan</label>
+                <input type="text" id="kasbonNoteInput" class="form-control" placeholder="Contoh: Berobat / Keperluan mendesak" style="margin-top: 5px;">
+            </div>
+            <button type="submit" class="btn btn-warning" style="width: 100%; font-weight: 600;">Tambah Kasbon</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL PENGAJUAN KASBON (PORTAL) -->
+<div class="modal" id="portalKasbonModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="card-title">Ajukan Kasbon</h2>
+            <button class="close-btn" onclick="closeModal('portalKasbonModal')">&times;</button>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Permohonan akan dikirimkan langsung ke WhatsApp Admin.</p>
+        <form onsubmit="submitPortalKasbon(event)">
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: 500; font-size: 14px;">Nominal yang Diajukan (Rp)</label>
+                <input type="number" id="portalKasbonAmt" class="form-control" required style="margin-top: 5px;" min="1">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: 500; font-size: 14px;">Alasan / Keperluan</label>
+                <input type="text" id="portalKasbonReason" class="form-control" required placeholder="Contoh: Beli keperluan keluarga" style="margin-top: 5px;">
+            </div>
+            <button type="submit" class="btn btn-warning" style="width: 100%; font-weight: 600; padding: 12px;">📤 Kirim via WhatsApp</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL KALENDER -->
+<div class="modal" id="calendarModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="card-title" id="calendarTitle">Kalender Absensi</h2>
+            <button class="close-btn" onclick="closeModal('calendarModal')">&times;</button>
+        </div>
+        <div class="calendar-header">
+            <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+</div>
+
+<!-- MODAL ABSEN HARIAN -->
+<div class="modal" id="dayAttendanceModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="card-title">Absensi: <span id="selectedDateTitle"></span></h2>
+            <button class="close-btn" onclick="closeModal('dayAttendanceModal')">&times;</button>
+        </div>
+        <div class="check-list" id="attendanceCheckList"></div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="saveDayAttendance()">Simpan Absensi</button>
+    </div>
+</div>
+
+<script>
+    document.getElementById('currentYear').innerText = new Date().getFullYear();
+
+    // TAUTAN API GOOGLE SHEETS ANDA
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzoyXAmAZPdkXxMU76E01Wpszpjd9N6Hk3826lWUViHI8-YLh9TGB37amvA4UbWyXC4Xw/exec';
+
+    let employees = [];
+    let attendanceData = {}; 
+    let monthSettings = {};   
+    let monthlyAbsence = {};
+    let monthlyKasbon = {}; 
+    
+    let inputMode = localStorage.getItem('inputMode') || 'manual'; 
+    let currentTotalDays = 0, currentHolidays = 0, currentWorkDays = 0;
+    let selectedDateForAbsen = "";
+    let isGajiHidden = false;
+    let currentPortalEmpId = null;
+
+    const formatRupiah = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number);
+    const getTodayStr = () => { const d = new Date(); return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`; }
+
+    // INISIALISASI & AMBIL DATA DARI CLOUD
+    window.onload = async () => {
+        try {
+            const res = await fetch(API_URL + "?t=" + Date.now(), { cache: 'no-store' });
+            const data = await res.json();
+
+            if (Object.keys(data).length === 0 && localStorage.getItem('employees')) {
+                employees = JSON.parse(localStorage.getItem('employees')) || [];
+                attendanceData = JSON.parse(localStorage.getItem('attendanceData')) || {};
+                monthSettings = JSON.parse(localStorage.getItem('monthSettings')) || {};
+                monthlyAbsence = JSON.parse(localStorage.getItem('monthlyAbsence')) || {};
+                monthlyKasbon = JSON.parse(localStorage.getItem('monthlyKasbon')) || {};
+                scheduleSync(); 
+            } else {
+                employees = data.employees || [];
+                attendanceData = data.attendanceData || {};
+                monthSettings = data.monthSettings || {};
+                monthlyAbsence = data.monthlyAbsence || {};
+                monthlyKasbon = data.monthlyKasbon || {};
+            }
+
+            document.getElementById('mainLoader').style.display = 'none';
+
+            const hash = window.location.hash;
+            if (hash.startsWith('#portal=')) {
+                loadEmployeePortal(hash.replace('#portal=', ''));
+            } else {
+                document.getElementById('adminView').style.display = 'block';
+                updateMealLedger(); 
+                
+                const now = new Date();
+                const initPicker = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+                document.getElementById('monthPicker').value = initPicker;
+                setMode(inputMode, true); 
+                updateMonthData();
+            }
+
+        } catch (error) {
+            alert("Gagal terhubung ke Cloud. Pastikan koneksi internet Anda aktif!");
+            document.getElementById('mainLoader').innerHTML = `<h3 style="color:var(--danger);">Koneksi Terputus</h3><p>Muat ulang halaman saat internet kembali stabil.</p>`;
+        }
+    };
+
+    // SISTEM AUTO-SAVE KE CLOUD
+    let syncTimer;
+    function scheduleSync() {
+        const dot = document.getElementById('syncDot');
+        const text = document.getElementById('syncText');
+        dot.style.background = 'var(--warning)';
+        text.innerText = 'Menyimpan...';
+
+        clearTimeout(syncTimer);
+        syncTimer = setTimeout(async () => {
+            const payload = { employees, attendanceData, monthSettings, monthlyAbsence, monthlyKasbon };
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
+                });
+                dot.style.background = 'var(--success)';
+                text.innerText = 'Tersimpan di Cloud';
+            } catch(e) {
+                dot.style.background = 'var(--danger)';
+                text.innerText = 'Gagal Sinkron!';
+                alert("Peringatan: Gagal menyimpan perubahan ke Cloud. Cek internet Anda.");
+            }
+        }, 1500);
+    }
+
+    function updateMealLedger() {
+        let updated = false;
+        let todayStr = getTodayStr();
+        let todayDate = new Date(todayStr);
+
+        employees.forEach(emp => {
+            if (!emp.dailyRates) { emp.dailyRates = {}; updated = true; }
+            if (!emp.mealStartDate) { emp.mealStartDate = `${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2,'0')}-01`; updated = true; }
+            if (!emp.mealEndDate) { emp.mealEndDate = `${new Date().getFullYear()}-12-31`; updated = true; }
+
+            let startDate = new Date(emp.mealStartDate);
+            let endDate = new Date(emp.mealEndDate);
+            let scanEnd = endDate < todayDate ? endDate : todayDate;
+            let d = new Date(startDate);
+            
+            while (d <= scanEnd) {
+                if (d.getDay() !== 0) {
+                    let y = d.getFullYear();
+                    let m = (d.getMonth() + 1).toString().padStart(2, '0');
+                    let day = d.getDate().toString().padStart(2, '0');
+                    let localDateStr = `${y}-${m}-${day}`;
+
+                    if (emp.dailyRates[localDateStr] === undefined) {
+                        emp.dailyRates[localDateStr] = emp.mealRate || 0;
+                        updated = true;
+                    }
+                }
+                d.setDate(d.getDate() + 1);
+            }
+        });
+        if (updated) scheduleSync();
+    }
+
+    function setMode(mode, isInit = false) {
+        inputMode = mode;
+        localStorage.setItem('inputMode', mode); 
+        
+        if (mode === 'manual') {
+            document.getElementById('btnModeManual').classList.add('active');
+            document.getElementById('btnModeCalendar').classList.remove('active');
+            document.getElementById('btnOpenCalendar').style.display = 'none';
+        } else {
+            document.getElementById('btnModeCalendar').classList.add('active');
+            document.getElementById('btnModeManual').classList.remove('active');
+            document.getElementById('btnOpenCalendar').style.display = 'inline-flex';
+            if(!isInit) syncAbsenceFromCalendar(); 
+        }
+        if (!isInit) renderTable();
+    }
+
+    function updateMonthData() {
+        const picker = document.getElementById('monthPicker').value;
+        if (!picker) return;
+
+        const [year, month] = picker.split('-');
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        document.getElementById('infoMonthName').innerText = `Info ${monthNames[parseInt(month)-1]} ${year}:`;
+
+        currentTotalDays = new Date(year, parseInt(month), 0).getDate();
+        document.getElementById('lblTotalDays').innerText = currentTotalDays;
+
+        if (monthSettings[picker] !== undefined) {
+            currentHolidays = monthSettings[picker].holidays;
+        } else {
+            currentHolidays = 0;
+            for (let d = 1; d <= currentTotalDays; d++) {
+                if (new Date(year, month - 1, d).getDay() === 0) currentHolidays++;
+            }
+        }
+        document.getElementById('valHolidays').value = currentHolidays;
+        recalculateWorkDays();
+    }
+
+    function recalculateWorkDays() {
+        let h = parseInt(document.getElementById('valHolidays').value) || 0;
+        if (h < 0) h = 0; if (h > currentTotalDays) h = currentTotalDays;
+        currentHolidays = h;
+        currentWorkDays = currentTotalDays - currentHolidays;
+        document.getElementById('lblWorkDays').innerText = currentWorkDays;
+        
+        const picker = document.getElementById('monthPicker').value;
+        monthSettings[picker] = { holidays: currentHolidays };
+        scheduleSync();
+
+        if (inputMode === 'calendar') syncAbsenceFromCalendar();
+        else renderTable();
+    }
+
+    function toggleGaji() {
+        isGajiHidden = !isGajiHidden;
+        const table = document.getElementById('employeeTable');
+        if (isGajiHidden) table.classList.add('hide-gaji');
+        else table.classList.remove('hide-gaji');
+    }
+
+    function calculateGaji(emp, hariMasuk, kasbonTotal = 0, specificWorkDays = currentWorkDays) {
+        const type = emp.type || 'bulanan';
+        let kotor = type === 'harian' ? Math.round(emp.salary * hariMasuk) : (specificWorkDays > 0 ? Math.round((emp.salary / specificWorkDays) * hariMasuk) : 0);
+        let bersih = kotor - kasbonTotal;
+        return bersih < 0 ? 0 : bersih;
+    }
+
+    function getMealBalance(empId) {
+        const emp = employees.find(e => e.id == empId);
+        if (!emp || !emp.mealStartDate || !emp.mealEndDate) return 0;
+        
+        let startDate = new Date(emp.mealStartDate);
+        let endDate = new Date(emp.mealEndDate);
+        let todayDate = new Date(getTodayStr());
+        let scanEnd = endDate < todayDate ? endDate : todayDate;
+        
+        let totalEarned = 0;
+        let d = new Date(startDate);
+        let monthWorkDays = {}; 
+        
+        while (d <= scanEnd) {
+            if (d.getDay() !== 0) {
+                let y = d.getFullYear();
+                let m = (d.getMonth() + 1).toString().padStart(2, '0');
+                let day = d.getDate().toString().padStart(2, '0');
+                let localDateStr = `${y}-${m}-${day}`;
+                let monthStr = `${y}-${m}`;
+
+                let dayRate = emp.dailyRates[localDateStr] || 0;
+                
+                if (inputMode === 'calendar') {
+                    let absenVal = 0;
+                    let daily = attendanceData[localDateStr];
+                    if (daily) {
+                        if (Array.isArray(daily)) { if (daily.includes(emp.id)) absenVal = 1; } 
+                        else { absenVal = daily[emp.id] || 0; }
+                    }
+                    totalEarned += (1 - absenVal) * dayRate;
+                } else {
+                    if (!monthWorkDays[monthStr]) monthWorkDays[monthStr] = 0;
+                    monthWorkDays[monthStr] += dayRate;
+                }
+            }
+            d.setDate(d.getDate() + 1);
+        }
+
+        if (inputMode === 'manual') {
+            for (let monthStr in monthWorkDays) {
+                let abs = (monthlyAbsence[monthStr] && monthlyAbsence[monthStr][empId]) ? monthlyAbsence[monthStr][empId] : 0;
+                let earnedMonth = monthWorkDays[monthStr];
+                let deduction = abs * (emp.mealRate || 0);
+                let net = earnedMonth - deduction;
+                if (net < 0) net = 0;
+                totalEarned += net;
+            }
+        }
+        return totalEarned - (emp.mealWithdrawn || 0);
+    }
+
+    function getTotalKasbon(picker, empId) {
+        if (!monthlyKasbon[picker] || !monthlyKasbon[picker][empId]) return 0;
+        return monthlyKasbon[picker][empId].reduce((sum, item) => sum + item.amount, 0);
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('employeeBody');
+        tbody.innerHTML = '';
+        let grandTotal = 0;
+        const picker = document.getElementById('monthPicker').value;
+        if (!monthlyAbsence[picker]) monthlyAbsence[picker] = {};
+
+        if (employees.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px;">Belum ada data. Tambah Pegawai Baru.</td></tr>`;
+            document.getElementById('grandTotal').innerText = formatRupiah(0);
+            return;
+        }
+
+        let isReadonly = inputMode === 'calendar' ? 'readonly' : '';
+        let inputStyle = inputMode === 'calendar' ? 'background-color: #F3F4F6; cursor: not-allowed; opacity: 0.7;' : 'border-color: var(--success); color: var(--success); font-weight: bold;';
+        let inputAbsenStyle = inputMode === 'calendar' ? 'background-color: #F3F4F6; cursor: not-allowed; opacity: 0.7;' : '';
+
+        employees.forEach(emp => {
+            let absenDays = monthlyAbsence[picker][emp.id] || 0;
+            if (absenDays > currentWorkDays) absenDays = currentWorkDays;
+            
+            let hariMasuk = currentWorkDays - absenDays;
+            let kasbonTotal = getTotalKasbon(picker, emp.id);
+            let gajiDiterima = calculateGaji(emp, hariMasuk, kasbonTotal);
+            grandTotal += gajiDiterima;
+            
+            const empType = emp.type || 'bulanan';
+            const badgeClass = empType === 'harian' ? 'badge-harian' : 'badge-bulanan';
+            const kasbonBadge = kasbonTotal > 0 ? `<br><span class="badge" style="background:#FEF3C7; color:#D97706;">Kasbon: -${formatRupiah(kasbonTotal)}</span>` : '';
+
+            tbody.innerHTML += `
+                <tr>
+                    <td style="font-weight:600;">
+                        ${emp.name}
+                        <span id="meal-bal-${emp.id}" class="badge badge-saldo">💳 Saldo: ${formatRupiah(getMealBalance(emp.id))}</span>
+                    </td>
+                    <td>
+                        <span class="gaji-val">${formatRupiah(emp.salary)}</span>
+                        <br><span class="badge ${badgeClass}">${empType === 'harian' ? 'Harian' : 'Bulanan'}</span>
+                        ${kasbonBadge}
+                    </td>
+                    <td>
+                        <input type="number" id="absen-${emp.id}" class="form-control input-absen" style="${inputAbsenStyle}" min="0" max="${currentWorkDays}" step="0.5" value="${absenDays}" oninput="handleAbsenChange('${emp.id}')" ${isReadonly}>
+                    </td>
+                    <td>
+                        <input type="number" id="masuk-${emp.id}" class="form-control input-absen" style="${inputStyle}" min="0" max="${currentWorkDays}" step="0.5" value="${hariMasuk}" oninput="handleMasukChange('${emp.id}')" ${isReadonly}>
+                    </td>
+                    <td style="font-weight:700; color:var(--primary);" id="gaji-${emp.id}">${formatRupiah(gajiDiterima)}</td>
+                    <td style="text-align: center;">
+                        <div style="display: flex; gap: 4px; margin-bottom: 4px;">
+                            <button class="btn btn-success" style="flex: 1; padding: 6px; font-size: 11px;" onclick="openMealWithdrawModal('${emp.id}')">💳 Tabungan</button>
+                            <button class="btn btn-info" style="flex: 1; padding: 6px; font-size: 11px;" onclick="openKasbonModal('${emp.id}')">💸 Kasbon</button>
+                        </div>
+                        <div style="display: flex; gap: 4px; margin-bottom: 4px;">
+                            <button class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11px; background-color: #6366F1;" onclick="generateEmployeeLink('${emp.id}')">🔗 Copy Link Portal</button>
+                        </div>
+                        <div style="display: flex; gap: 4px;">
+                            <button class="btn btn-warning" style="flex: 1; padding: 5px; font-size: 11px;" onclick="openModal('edit', '${emp.id}')">Edit</button>
+                            <button class="btn btn-danger" style="flex: 1; padding: 5px; font-size: 11px;" onclick="deleteEmployee('${emp.id}')">Hapus</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        document.getElementById('grandTotal').innerText = formatRupiah(grandTotal);
+    }
+
+    function handleAbsenChange(id) {
+        if(inputMode === 'calendar') return; 
+        let absen = parseFloat(document.getElementById(`absen-${id}`).value) || 0;
+        if(absen < 0) absen = 0; if(absen > currentWorkDays) absen = currentWorkDays;
+        let masuk = currentWorkDays - absen;
+        document.getElementById(`masuk-${id}`).value = masuk; 
+        updateSalaryState(id, absen, masuk);
+    }
+
+    function handleMasukChange(id) {
+        if(inputMode === 'calendar') return; 
+        let masuk = parseFloat(document.getElementById(`masuk-${id}`).value) || 0;
+        if(masuk < 0) masuk = 0; if(masuk > currentWorkDays) masuk = currentWorkDays;
+        let absen = currentWorkDays - masuk;
+        document.getElementById(`absen-${id}`).value = absen; 
+        updateSalaryState(id, absen, masuk);
+    }
+
+    function updateSalaryState(id, absen, masuk) {
+        const emp = employees.find(e => e.id == id);
+        if(!emp) return;
+        const picker = document.getElementById('monthPicker').value;
+        if (!monthlyAbsence[picker]) monthlyAbsence[picker] = {};
+        monthlyAbsence[picker][id] = absen;
+        scheduleSync();
+        
+        let kasbonTotal = getTotalKasbon(picker, id);
+        document.getElementById(`gaji-${id}`).innerText = formatRupiah(calculateGaji(emp, masuk, kasbonTotal));
+        document.getElementById(`meal-bal-${id}`).innerText = `💳 Saldo: ${formatRupiah(getMealBalance(id))}`;
+        
+        let total = 0;
+        employees.forEach(e => {
+            let a = monthlyAbsence[picker][e.id] || 0;
+            if(a > currentWorkDays) a = currentWorkDays;
+            total += calculateGaji(e, currentWorkDays - a, getTotalKasbon(picker, e.id));
+        });
+        document.getElementById('grandTotal').innerText = formatRupiah(total);
+    }
+
+    // KASBON
+    function openKasbonModal(empId) {
+        const emp = employees.find(e => e.id == empId);
+        document.getElementById('kasbonEmpId').value = empId;
+        document.getElementById('kasbonEmpName').innerText = emp.name;
+        document.getElementById('kasbonAmountInput').value = '';
+        document.getElementById('kasbonNoteInput').value = '';
+        renderKasbonList(empId);
+        document.getElementById('kasbonModal').classList.add('active');
+    }
+
+    function renderKasbonList(empId) {
+        const picker = document.getElementById('monthPicker').value;
+        const container = document.getElementById('kasbonListContainer');
+        container.innerHTML = '';
+        if (!monthlyKasbon[picker] || !monthlyKasbon[picker][empId] || monthlyKasbon[picker][empId].length === 0) {
+            container.innerHTML = `<i style="color:var(--text-muted); font-size:13px;">Belum ada catatan kasbon.</i>`;
+            return;
+        }
+        monthlyKasbon[picker][empId].forEach((item, index) => {
+            container.innerHTML += `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 6px 10px; border-radius: 4px; margin-bottom: 5px; border: 1px solid var(--border); font-size: 13px;">
+                    <div><strong>${formatRupiah(item.amount)}</strong> - <span style="color:var(--text-muted);">${item.note}</span></div>
+                    <button class="btn btn-danger" style="padding: 2px 8px; font-size: 11px;" onclick="cancelKasbon('${empId}', ${index})">Batal</button>
+                </div>
+            `;
+        });
+    }
+
+    function saveKasbonAdmin(e) {
+        e.preventDefault();
+        const empId = document.getElementById('kasbonEmpId').value;
+        const amount = parseFloat(document.getElementById('kasbonAmountInput').value);
+        const note = document.getElementById('kasbonNoteInput').value || 'Kasbon';
+        const picker = document.getElementById('monthPicker').value;
+        if (!amount || amount <= 0) return;
+        if (!monthlyKasbon[picker]) monthlyKasbon[picker] = {};
+        if (!monthlyKasbon[picker][empId]) monthlyKasbon[picker][empId] = [];
+        monthlyKasbon[picker][empId].push({ amount, note, date: new Date().toISOString() });
+        scheduleSync();
+        document.getElementById('kasbonAmountInput').value = '';
+        document.getElementById('kasbonNoteInput').value = '';
+        renderKasbonList(empId);
+        renderTable();
+    }
+
+    function cancelKasbon(empId, index) {
+        const picker = document.getElementById('monthPicker').value;
+        if (monthlyKasbon[picker] && monthlyKasbon[picker][empId]) {
+            monthlyKasbon[picker][empId].splice(index, 1);
+            scheduleSync();
+            renderKasbonList(empId);
+            renderTable();
+        }
+    }
+
+    // LINK PORTAL KARYAWAN
+    function generateEmployeeLink(empId) {
+        const shareableUrl = `${window.location.origin}${window.location.pathname}#portal=${empId}`;
+        navigator.clipboard.writeText(shareableUrl).then(() => {
+            alert(`Link portal sukses disalin!\nLink ini permanen & real-time.`);
+        }).catch(() => prompt("Salin link ini:", shareableUrl));
+    }
+
+    function loadEmployeePortal(empId) {
+        currentPortalEmpId = empId;
+        const emp = employees.find(e => e.id == empId);
+        if (!emp) { alert("Data Karyawan tidak ditemukan di Database Cloud."); return; }
+
+        document.getElementById('adminView').style.display = 'none';
+        document.getElementById('cloudStatus').style.display = 'none'; 
+        document.getElementById('portalView').style.display = 'block';
+
+        const now = new Date();
+        document.getElementById('portalMonthPicker').value = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+        renderPortalData();
+    }
+
+    function renderPortalData() {
+        const emp = employees.find(e => e.id == currentPortalEmpId);
+        const picker = document.getElementById('portalMonthPicker').value;
+        const [year, month] = picker.split('-');
+        
+        const totalDays = new Date(year, parseInt(month), 0).getDate();
+        let holidays = 0;
+        if (monthSettings[picker] !== undefined) {
+            holidays = monthSettings[picker].holidays;
+        } else {
+            for (let d = 1; d <= totalDays; d++) { if (new Date(year, month - 1, d).getDay() === 0) holidays++; }
+        }
+        const workDays = totalDays - holidays;
+        const absenDays = monthlyAbsence[picker] && monthlyAbsence[picker][emp.id] ? monthlyAbsence[picker][emp.id] : 0;
+        let hariMasuk = workDays - absenDays;
+        if (hariMasuk < 0) hariMasuk = 0;
+
+        const kasbonTotal = getTotalKasbon(picker, emp.id);
+        const netSalary = calculateGaji(emp, hariMasuk, kasbonTotal, workDays);
+        const mealBal = getMealBalance(emp.id);
+
+        document.getElementById('portalEmpName').innerText = emp.name;
+        const badge = document.getElementById('portalEmpTypeBadge');
+        badge.innerText = emp.type === 'harian' ? 'Harian' : 'Bulanan';
+        badge.className = emp.type === 'harian' ? 'badge badge-harian' : 'badge badge-bulanan';
+
+        document.getElementById('portalWorkDays').innerText = `${hariMasuk} dari ${workDays} Hari`;
+        document.getElementById('portalNetSalary').innerText = formatRupiah(netSalary);
+        document.getElementById('portalMealBalance').innerText = formatRupiah(mealBal);
+        document.getElementById('portalKasbonTotal').innerText = formatRupiah(kasbonTotal);
+    }
+
+    function openPortalKasbonModal() {
+        document.getElementById('portalKasbonAmt').value = '';
+        document.getElementById('portalKasbonReason').value = '';
+        document.getElementById('portalKasbonModal').classList.add('active');
+    }
+
+    function submitPortalKasbon(e) {
+        e.preventDefault();
+        const amt = document.getElementById('portalKasbonAmt').value;
+        const reason = document.getElementById('portalKasbonReason').value;
+        const emp = employees.find(e => e.id == currentPortalEmpId);
+        const picker = document.getElementById('portalMonthPicker').value;
+        
+        const msg = `Halo Admin, saya ${emp.name} ingin mengajukan Kasbon sebesar *${formatRupiah(amt)}* untuk: _${reason}_ (Periode: ${picker}).`;
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+        closeModal('portalKasbonModal');
+    }
+
+    // TARIK TABUNGAN
+    function openMealWithdrawModal(id) {
+        const emp = employees.find(e => e.id == id);
+        const bal = getMealBalance(id);
+        document.getElementById('mealWithdrawEmpId').value = id;
+        document.getElementById('modalMealBalance').innerText = formatRupiah(bal);
+        
+        const inputAmt = document.getElementById('mealWithdrawAmount');
+        const btnSubmit = document.getElementById('btnWithdrawSubmit');
+        if (bal <= 0) { inputAmt.disabled = true; btnSubmit.disabled = true; inputAmt.placeholder = 'Saldo kosong'; } 
+        else { inputAmt.disabled = false; btnSubmit.disabled = false; inputAmt.max = bal; }
+        document.getElementById('mealWithdrawModal').classList.add('active');
+    }
+
+    function processMealWithdraw(e) {
+        e.preventDefault();
+        const id = document.getElementById('mealWithdrawEmpId').value;
+        const amount = parseFloat(document.getElementById('mealWithdrawAmount').value);
+        const emp = employees.find(e => e.id == id);
+        if(emp) {
+            if (amount > getMealBalance(id)) { alert("Gagal: Melebihi saldo!"); return; }
+            emp.mealWithdrawn = (emp.mealWithdrawn || 0) + amount; 
+            scheduleSync();
+            renderTable();
+            closeModal('mealWithdrawModal');
+            alert(`Berhasil menarik ${formatRupiah(amount)}`);
+        }
+    }
+
+    // CALENDAR ABSENSI
+    function openCalendarModal() {
+        const picker = document.getElementById('monthPicker').value;
+        const [year, month] = picker.split('-');
+        document.getElementById('calendarTitle').innerText = `Kalender - ${picker}`;
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+        
+        const firstDay = new Date(year, month - 1, 1).getDay();
+        for (let i = 0; i < firstDay; i++) { grid.innerHTML += `<div class="calendar-day empty"></div>`; }
+        
+        for (let d = 1; d <= currentTotalDays; d++) {
+            const dateStr = `${year}-${month}-${d.toString().padStart(2, '0')}`;
+            const isSunday = new Date(year, month - 1, d).getDay() === 0;
+            let dailyData = attendanceData[dateStr] || {};
+            let absenCount = Array.isArray(dailyData) ? dailyData.length : Object.keys(dailyData).length;
+            let badgeHtml = absenCount > 0 ? `<div class="absent-badge">${absenCount} Absen</div>` : '';
+            grid.innerHTML += `<div class="calendar-day ${isSunday ? 'sunday' : ''}" onclick="openDayAttendance('${dateStr}')">${d} ${badgeHtml}</div>`;
+        }
+        document.getElementById('calendarModal').classList.add('active');
+    }
+
+    function openDayAttendance(dateStr) {
+        selectedDateForAbsen = dateStr;
+        document.getElementById('selectedDateTitle').innerText = dateStr;
+        const checkList = document.getElementById('attendanceCheckList');
+        checkList.innerHTML = '';
+        
+        let dailyData = attendanceData[dateStr] || {};
+        if (Array.isArray(dailyData)) { let c = {}; dailyData.forEach(id => c[id] = 1); dailyData = c; }
+        
+        if (employees.length === 0) checkList.innerHTML = `<i>Belum ada pegawai.</i>`;
+        else {
+            employees.forEach(emp => {
+                let currentVal = dailyData[emp.id] || 0; 
+                checkList.innerHTML += `
+                    <div class="check-item">
+                        <span>${emp.name}</span>
+                        <select class="select-absen day-absen-input" data-id="${emp.id}">
+                            <option value="0" style="color:var(--success)" ${currentVal == 0 ? 'selected' : ''}>Hadir</option>
+                            <option value="0.5" style="color:var(--warning)" ${currentVal == 0.5 ? 'selected' : ''}>Absen ½ Hari</option>
+                            <option value="1" style="color:var(--danger)" ${currentVal == 1 ? 'selected' : ''}>Absen 1 Hari</option>
+                        </select>
+                    </div>`;
+            });
+        }
+        document.getElementById('dayAttendanceModal').classList.add('active');
+    }
+
+    function saveDayAttendance() {
+        const selects = document.querySelectorAll('.day-absen-input');
+        let newDailyData = {};
+        selects.forEach(sel => { let val = parseFloat(sel.value); if (val > 0) { newDailyData[sel.getAttribute('data-id')] = val; } });
+        
+        if (Object.keys(newDailyData).length > 0) { attendanceData[selectedDateForAbsen] = newDailyData; } 
+        else { delete attendanceData[selectedDateForAbsen]; }
+        
+        scheduleSync();
+        closeModal('dayAttendanceModal');
+        openCalendarModal(); 
+        syncAbsenceFromCalendar(); 
+    }
+
+    function syncAbsenceFromCalendar() {
+        if(inputMode !== 'calendar') return; 
+        const picker = document.getElementById('monthPicker').value; 
+        if (!monthlyAbsence[picker]) monthlyAbsence[picker] = {};
+        employees.forEach(emp => monthlyAbsence[picker][emp.id] = 0); 
+        
+        for (const dateStr in attendanceData) {
+            if (dateStr.startsWith(picker)) {
+                let dailyData = attendanceData[dateStr];
+                if (Array.isArray(dailyData)) { dailyData.forEach(empId => { if (monthlyAbsence[picker][empId] !== undefined) monthlyAbsence[picker][empId] += 1; }); } 
+                else { for (const empId in dailyData) { if (monthlyAbsence[picker][empId] !== undefined) monthlyAbsence[picker][empId] += dailyData[empId]; } }
+            }
+        }
+        scheduleSync();
+        renderTable();
+    }
+
+    function updateSalaryLabel() {
+        const type = document.querySelector('input[name="empType"]:checked').value;
+        document.getElementById('labelGajiPokok').innerText = type === 'harian' ? 'Tarif Gaji per Hari' : 'Gaji Pokok (Bulan Penuh)';
+    }
+
+    function openModal(mode, id = null) {
+        document.getElementById('employeeModal').classList.add('active');
+        document.getElementById('employeeForm').reset();
+        
+        let y = new Date().getFullYear();
+        let m = (new Date().getMonth() + 1).toString().padStart(2, '0');
+        let defaultStart = `${y}-${m}-01`;
+        let defaultEnd = `${y}-12-31`;
+
+        if (mode === 'add') {
+            document.getElementById('modalTitle').innerText = 'Tambah Pegawai';
+            document.getElementById('empId').value = '';
+            document.querySelector('input[name="empType"][value="bulanan"]').checked = true;
+            document.getElementById('empMealRate').value = 0;
+            document.getElementById('empMealStart').value = defaultStart;
+            document.getElementById('empMealEnd').value = defaultEnd;
+        } else {
+            document.getElementById('modalTitle').innerText = 'Edit Pegawai';
+            const emp = employees.find(e => e.id == id);
+            document.getElementById('empId').value = emp.id;
+            document.getElementById('empName').value = emp.name;
+            document.getElementById('empSalary').value = emp.salary;
+            document.getElementById('empMealRate').value = emp.mealRate || 0;
+            document.getElementById('empMealStart').value = emp.mealStartDate || defaultStart;
+            document.getElementById('empMealEnd').value = emp.mealEndDate || defaultEnd;
+            document.querySelector(`input[name="empType"][value="${emp.type || 'bulanan'}"]`).checked = true;
+        }
+        updateSalaryLabel(); 
+    }
+
+    function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+
+    function saveEmployee(e) {
+        e.preventDefault();
+        const id = document.getElementById('empId').value;
+        const name = document.getElementById('empName').value;
+        const salary = parseFloat(document.getElementById('empSalary').value);
+        const mealRate = parseFloat(document.getElementById('empMealRate').value) || 0;
+        const type = document.querySelector('input[name="empType"]:checked').value; 
+        const mealStartDate = document.getElementById('empMealStart').value;
+        const mealEndDate = document.getElementById('empMealEnd').value;
+
+        if (id) {
+            const index = employees.findIndex(e => e.id == id);
+            employees[index].name = name;
+            employees[index].salary = salary;
+            employees[index].type = type;
+            employees[index].mealRate = mealRate;
+            employees[index].mealStartDate = mealStartDate;
+            employees[index].mealEndDate = mealEndDate;
+            
+            let todayStr = getTodayStr();
+            if (employees[index].dailyRates) {
+                for (let dateStr in employees[index].dailyRates) { if (dateStr >= todayStr) employees[index].dailyRates[dateStr] = mealRate; }
+            }
+        } else {
+            employees.push({ 
+                id: Date.now().toString(), name: name, salary: salary, type: type, mealRate: mealRate,
+                mealStartDate: mealStartDate, mealEndDate: mealEndDate, mealWithdrawn: 0, dailyRates: {}
+            });
+        }
+        updateMealLedger(); 
+        closeModal('employeeModal');
+        renderTable();
+    }
+
+    function deleteEmployee(id) {
+        if (confirm('Yakin ingin menghapus pegawai ini beserta riwayat gajinya?')) {
+            employees = employees.filter(e => e.id != id);
+            scheduleSync();
+            renderTable();
+        }
+    }
+
+    // FITUR EXPORT
+    function exportData() {
+        const backupData = { employees, attendanceData, monthSettings, monthlyAbsence, monthlyKasbon };
+        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Backup_Gaji_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // FITUR IMPORT KE CLOUD
+    function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.employees) { employees = data.employees; }
+                if (data.attendanceData) { attendanceData = data.attendanceData; }
+                if (data.monthSettings) { monthSettings = data.monthSettings; }
+                if (data.monthlyAbsence) { monthlyAbsence = data.monthlyAbsence; }
+                if (data.monthlyKasbon) { monthlyKasbon = data.monthlyKasbon; }
+                
+                // Sinkronisasi data import langsung ke Cloud!
+                updateMealLedger();
+                scheduleSync(); 
+                
+                alert("Berhasil! Data JSON telah di-import dan sedang diunggah ke Google Sheets (Cloud).");
+                updateMonthData(); 
+            } catch (err) { alert("Gagal: File JSON tidak valid atau rusak!"); }
+        };
+        reader.readAsText(file);
+        event.target.value = ''; 
+    }
+</script>
+
+</body>
+</html>
