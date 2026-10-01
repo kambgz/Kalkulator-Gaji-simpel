@@ -47,6 +47,11 @@
         .btn-danger { background-color: var(--danger); color: white; padding: 6px 12px; font-size: 12px; }
         .btn-warning { background-color: var(--warning); color: white; padding: 6px 12px; font-size: 12px; }
 
+        /* SAKELAR MODE ABSENSI */
+        .mode-switch { display: flex; background: var(--border); border-radius: 8px; overflow: hidden; width: fit-content; margin-bottom: 15px;}
+        .mode-btn { padding: 10px 16px; border: none; background: transparent; cursor: pointer; font-weight: 600; font-size: 14px; color: var(--text-muted); transition: 0.3s; outline: none;}
+        .mode-btn.active { background: var(--primary); color: white; }
+
         .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; white-space: nowrap; }
         th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
@@ -74,7 +79,6 @@
         .calendar-day.empty { border: none; cursor: default; background: none; }
         .absent-badge { position: absolute; bottom: 2px; right: 2px; background-color: var(--danger); color: white; font-size: 10px; padding: 2px 5px; border-radius: 10px; }
 
-        /* PERUBAHAN STYLE UNTUK LIST ABSENSI */
         .check-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
         .check-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; background-color: #FAFAFA; }
         .check-item span { font-weight: 500; font-size: 15px; }
@@ -97,14 +101,26 @@
         </div>
     </div>
 
-    <!-- PENGATURAN BULAN -->
+    <!-- PENGATURAN BULAN & MODE -->
     <div class="card">
         <div class="card-header" style="margin-bottom: 10px;">
             <div class="card-title">1. Pengaturan Periode Gaji</div>
-            <button class="btn btn-primary" onclick="openCalendarModal()" style="background-color: var(--warning);">
-                📅 Kalender Absensi
+            
+            <!-- TOMBOL KALENDER (Hanya Muncul di Mode Kalender) -->
+            <button class="btn btn-primary" id="btnOpenCalendar" onclick="openCalendarModal()" style="background-color: var(--warning); display: none;">
+                📅 Buka Kalender Absensi
             </button>
         </div>
+
+        <!-- SAKELAR MODE -->
+        <div>
+            <label style="font-size: 13px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 5px;">Pilih Sumber Data Absensi:</label>
+            <div class="mode-switch">
+                <button class="mode-btn active" id="btnModeManual" onclick="setMode('manual')">✍️ Input Manual</button>
+                <button class="mode-btn" id="btnModeCalendar" onclick="setMode('calendar')">📅 Mode Kalender</button>
+            </div>
+        </div>
+
         <input type="month" id="monthPicker" class="form-control" style="max-width: 200px;" onchange="updateMonthData()">
         
         <div class="info-box" id="monthInfo">
@@ -191,7 +207,7 @@
     </div>
 </div>
 
-<!-- MODAL TANDAI ABSEN HARIAN (YANG DIREVISI) -->
+<!-- MODAL TANDAI ABSEN HARIAN -->
 <div class="modal" id="dayAttendanceModal">
     <div class="modal-content">
         <div class="modal-header">
@@ -209,9 +225,9 @@
 
     // --- DATABASE & STATE ---
     let employees = JSON.parse(localStorage.getItem('employees')) || [];
-    // Data attendance sekarang bentuknya: {"2026-10-05": {"id1": 1, "id2": 0.5}}
     let attendanceData = JSON.parse(localStorage.getItem('attendanceData')) || {}; 
     let monthSettings = JSON.parse(localStorage.getItem('monthSettings')) || {};   
+    let inputMode = localStorage.getItem('inputMode') || 'manual'; // Default Mode: Manual
     
     let currentTotalDays = 0;
     let currentHolidays = 0;
@@ -224,8 +240,28 @@
     window.onload = () => {
         const now = new Date();
         document.getElementById('monthPicker').value = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+        setMode(inputMode, true); // Inisialisasi Mode
         updateMonthData();
     };
+
+    // --- FUNGSI GANTI MODE (MANUAL vs KALENDER) ---
+    function setMode(mode, isInit = false) {
+        inputMode = mode;
+        localStorage.setItem('inputMode', mode);
+        
+        if (mode === 'manual') {
+            document.getElementById('btnModeManual').classList.add('active');
+            document.getElementById('btnModeCalendar').classList.remove('active');
+            document.getElementById('btnOpenCalendar').style.display = 'none';
+        } else {
+            document.getElementById('btnModeCalendar').classList.add('active');
+            document.getElementById('btnModeManual').classList.remove('active');
+            document.getElementById('btnOpenCalendar').style.display = 'inline-flex';
+            if(!isInit) syncAbsenceFromCalendar(); // Paksa hitung ulang dari kalender kalau pindah mode
+        }
+        
+        if (!isInit) renderTable();
+    }
 
     function updateMonthData() {
         const picker = document.getElementById('monthPicker').value;
@@ -263,8 +299,11 @@
         monthSettings[picker] = { holidays: currentHolidays };
         localStorage.setItem('monthSettings', JSON.stringify(monthSettings));
 
-        syncAbsenceFromCalendar();
-        renderTable();
+        if (inputMode === 'calendar') {
+            syncAbsenceFromCalendar();
+        } else {
+            renderTable();
+        }
     }
 
     function toggleGaji() {
@@ -288,6 +327,11 @@
             return;
         }
 
+        // Atur status input text apakah bisa diketik (Manual) atau dikunci (Kalender)
+        let isReadonly = inputMode === 'calendar' ? 'readonly' : '';
+        let inputStyle = inputMode === 'calendar' ? 'background-color: #F3F4F6; cursor: not-allowed; opacity: 0.7;' : 'border-color: var(--success); color: var(--success); font-weight: bold;';
+        let inputAbsenStyle = inputMode === 'calendar' ? 'background-color: #F3F4F6; cursor: not-allowed; opacity: 0.7;' : '';
+
         employees.forEach(emp => {
             let absenDays = emp.currentAbsen || 0;
             if (absenDays > currentWorkDays) absenDays = currentWorkDays;
@@ -305,10 +349,10 @@
                 <td style="font-weight:600;">${emp.name}</td>
                 <td><span class="gaji-val">${formatRupiah(emp.salary)}</span></td>
                 <td>
-                    <input type="number" id="absen-${emp.id}" class="form-control input-absen" min="0" max="${currentWorkDays}" step="0.5" value="${absenDays}" oninput="handleAbsenChange('${emp.id}')">
+                    <input type="number" id="absen-${emp.id}" class="form-control input-absen" style="${inputAbsenStyle}" min="0" max="${currentWorkDays}" step="0.5" value="${absenDays}" oninput="handleAbsenChange('${emp.id}')" ${isReadonly}>
                 </td>
                 <td>
-                    <input type="number" id="masuk-${emp.id}" class="form-control input-absen" style="border-color:var(--success); color:var(--success); font-weight:bold;" min="0" max="${currentWorkDays}" step="0.5" value="${hariMasuk}" oninput="handleMasukChange('${emp.id}')">
+                    <input type="number" id="masuk-${emp.id}" class="form-control input-absen" style="${inputStyle}" min="0" max="${currentWorkDays}" step="0.5" value="${hariMasuk}" oninput="handleMasukChange('${emp.id}')" ${isReadonly}>
                 </td>
                 <td style="font-weight:700; color:var(--primary);" id="gaji-${emp.id}">${formatRupiah(gajiDiterima)}</td>
                 <td style="text-align: center;">
@@ -323,6 +367,8 @@
     }
 
     function handleAbsenChange(id) {
+        if(inputMode === 'calendar') return; // Cegah ketik jika mode kalender tembus (safeguard)
+
         let absen = parseFloat(document.getElementById(`absen-${id}`).value) || 0;
         if(absen < 0) absen = 0; if(absen > currentWorkDays) absen = currentWorkDays;
         
@@ -332,6 +378,8 @@
     }
 
     function handleMasukChange(id) {
+        if(inputMode === 'calendar') return; // Cegah ketik jika mode kalender tembus
+
         let masuk = parseFloat(document.getElementById(`masuk-${id}`).value) || 0;
         if(masuk < 0) masuk = 0; if(masuk > currentWorkDays) masuk = currentWorkDays;
         
@@ -344,7 +392,9 @@
         const emp = employees.find(e => e.id == id);
         if(!emp) return;
         
-        emp.currentAbsen = absen;
+        emp.currentAbsen = absen; // Simpan ke memory
+        localStorage.setItem('employees', JSON.stringify(employees)); // Permanenkan simpanan manual
+        
         let gajiDiterima = 0;
         if(currentWorkDays > 0) gajiDiterima = Math.round((emp.salary / currentWorkDays) * masuk);
         
@@ -381,9 +431,7 @@
             const dateStr = `${year}-${month}-${d.toString().padStart(2, '0')}`;
             const isSunday = new Date(year, month - 1, d).getDay() === 0;
             
-            // Hitung ada berapa orang yang absen di tanggal ini
             let dailyData = attendanceData[dateStr] || {};
-            // Antisipasi format lama (array)
             let absenCount = Array.isArray(dailyData) ? dailyData.length : Object.keys(dailyData).length;
             
             let badgeHtml = absenCount > 0 ? `<div class="absent-badge">${absenCount} Absen</div>` : '';
@@ -398,7 +446,7 @@
         document.getElementById('calendarModal').classList.add('active');
     }
 
-function openDayAttendance(dateStr, dayNum) {
+    function openDayAttendance(dateStr, dayNum) {
         selectedDateForAbsen = dateStr;
         document.getElementById('selectedDateTitle').innerText = dateStr;
         
@@ -407,7 +455,6 @@ function openDayAttendance(dateStr, dayNum) {
         
         let dailyData = attendanceData[dateStr] || {};
         
-        // Migrasi jika masih format array dari versi sebelumnya
         if (Array.isArray(dailyData)) {
             let converted = {};
             dailyData.forEach(id => converted[id] = 1);
@@ -418,7 +465,7 @@ function openDayAttendance(dateStr, dayNum) {
             checkList.innerHTML = `<i style="color:var(--text-muted)">Belum ada data pegawai.</i>`;
         } else {
             employees.forEach(emp => {
-                let currentVal = dailyData[emp.id] || 0; // default 0 (Hadir)
+                let currentVal = dailyData[emp.id] || 0; 
                 
                 checkList.innerHTML += `
                     <div class="check-item">
@@ -461,6 +508,8 @@ function openDayAttendance(dateStr, dayNum) {
     }
 
     function syncAbsenceFromCalendar() {
+        if(inputMode !== 'calendar') return; // Hanya sinkron kalau sedang mode kalender
+
         const picker = document.getElementById('monthPicker').value; 
         
         employees.forEach(emp => emp.currentAbsen = 0);
@@ -469,14 +518,12 @@ function openDayAttendance(dateStr, dayNum) {
             if (dateStr.startsWith(picker)) {
                 let dailyData = attendanceData[dateStr];
                 
-                // Antisipasi format lama (array)
                 if (Array.isArray(dailyData)) {
                     dailyData.forEach(empId => {
                         const emp = employees.find(e => e.id == empId);
                         if (emp) emp.currentAbsen += 1;
                     });
                 } else {
-                    // Format baru (object dengan value 0.5 atau 1)
                     for (const empId in dailyData) {
                         const emp = employees.find(e => e.id == empId);
                         if (emp) emp.currentAbsen += dailyData[empId];
@@ -484,6 +531,7 @@ function openDayAttendance(dateStr, dayNum) {
                 }
             }
         }
+        localStorage.setItem('employees', JSON.stringify(employees)); // Permanenkan state
         renderTable();
     }
 
