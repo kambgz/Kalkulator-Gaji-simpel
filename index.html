@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Penggajian Pegawai Lengkap</title>
+    <title>Sistem Penggajian Pegawai</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -25,12 +25,14 @@
         body { background-color: var(--bg); color: var(--text-main); padding: 20px; }
         .container { max-width: 1000px; margin: 0 auto; }
         
-        .header { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; text-align: center; gap: 10px; }
+        .header { display: flex; flex-direction: column; align-items: center; margin-bottom: 25px; text-align: center; gap: 10px; }
         .header h1 { font-size: 24px; font-weight: 700; color: var(--primary); }
-        .top-actions { display: flex; gap: 10px; }
+        
+        /* Tombol Aksi Atas (Export, Import, Tambah Pegawai) */
+        .top-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
 
         .card { background-color: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
         .card-title { font-size: 18px; font-weight: 600; }
         
         .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; transition: 0.2s; }
@@ -49,7 +51,7 @@
 
         /* SAKELAR MODE ABSENSI */
         .mode-switch { display: flex; background: var(--border); border-radius: 8px; overflow: hidden; width: fit-content; margin-bottom: 15px;}
-        .mode-btn { padding: 10px 16px; border: none; background: transparent; cursor: pointer; font-weight: 600; font-size: 14px; color: var(--text-muted); transition: 0.3s; outline: none;}
+        .mode-btn { padding: 8px 14px; border: none; background: transparent; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--text-muted); transition: 0.3s; outline: none;}
         .mode-btn.active { background: var(--primary); color: white; }
 
         .table-responsive { overflow-x: auto; }
@@ -94,25 +96,26 @@
 <div class="container">
     <div class="header">
         <h1>Sistem Penggajian Pegawai</h1>
+        
+        <!-- POSISI BARU: TOMBOL TAMBAH PEGAWAI & IMPORT/EXPORT DI ATAS -->
         <div class="top-actions">
+            <button class="btn btn-primary" onclick="openModal('add')">+ Tambah Pegawai</button>
             <button class="btn btn-secondary" onclick="exportData()">💾 Export Data</button>
             <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Import Data</button>
             <input type="file" id="importFile" accept=".json" style="display: none" onchange="importData(event)">
         </div>
     </div>
 
-    <!-- PENGATURAN BULAN & MODE -->
+    <!-- PENGATURAN PERIODE GAJI (URUTAN KEDUA) -->
     <div class="card">
         <div class="card-header" style="margin-bottom: 10px;">
-            <div class="card-title">1. Pengaturan Periode Gaji</div>
+            <div class="card-title">Pengaturan Periode Gaji</div>
             
-            <!-- TOMBOL KALENDER (Hanya Muncul di Mode Kalender) -->
             <button class="btn btn-primary" id="btnOpenCalendar" onclick="openCalendarModal()" style="background-color: var(--warning); display: none;">
                 📅 Buka Kalender Absensi
             </button>
         </div>
 
-        <!-- SAKELAR MODE -->
         <div>
             <label style="font-size: 13px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 5px;">Pilih Sumber Data Absensi:</label>
             <div class="mode-switch">
@@ -132,11 +135,10 @@
         </div>
     </div>
 
-    <!-- TABEL PEGAWAI -->
+    <!-- DAFTAR GAJI PEGAWAI (URUTAN KETIGA) -->
     <div class="card">
-        <div class="card-header">
-            <div class="card-title">2. Daftar Gaji Pegawai</div>
-            <button class="btn btn-primary" onclick="openModal('add')">+ Tambah Pegawai</button>
+        <div class="card-header" style="margin-bottom: 5px;">
+            <div class="card-title">Daftar Gaji Pegawai</div>
         </div>
         
         <div class="table-responsive">
@@ -223,11 +225,10 @@
 <script>
     document.getElementById('currentYear').innerText = new Date().getFullYear();
 
-    // --- DATABASE & STATE ---
     let employees = JSON.parse(localStorage.getItem('employees')) || [];
     let attendanceData = JSON.parse(localStorage.getItem('attendanceData')) || {}; 
     let monthSettings = JSON.parse(localStorage.getItem('monthSettings')) || {};   
-    let inputMode = localStorage.getItem('inputMode') || 'manual'; // Default Mode: Manual
+    let inputMode = localStorage.getItem('inputMode') || 'manual'; 
     
     let currentTotalDays = 0;
     let currentHolidays = 0;
@@ -240,11 +241,10 @@
     window.onload = () => {
         const now = new Date();
         document.getElementById('monthPicker').value = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-        setMode(inputMode, true); // Inisialisasi Mode
+        setMode(inputMode, true); 
         updateMonthData();
     };
 
-    // --- FUNGSI GANTI MODE (MANUAL vs KALENDER) ---
     function setMode(mode, isInit = false) {
         inputMode = mode;
         localStorage.setItem('inputMode', mode);
@@ -257,7 +257,7 @@
             document.getElementById('btnModeCalendar').classList.add('active');
             document.getElementById('btnModeManual').classList.remove('active');
             document.getElementById('btnOpenCalendar').style.display = 'inline-flex';
-            if(!isInit) syncAbsenceFromCalendar(); // Paksa hitung ulang dari kalender kalau pindah mode
+            if(!isInit) syncAbsenceFromCalendar(); 
         }
         
         if (!isInit) renderTable();
@@ -322,12 +322,11 @@
         let grandTotal = 0;
 
         if (employees.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px;">Belum ada data pegawai.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px;">Belum ada data pegawai. Silakan klik tombol "+ Tambah Pegawai" di atas.</td></tr>`;
             document.getElementById('grandTotal').innerText = formatRupiah(0);
             return;
         }
 
-        // Atur status input text apakah bisa diketik (Manual) atau dikunci (Kalender)
         let isReadonly = inputMode === 'calendar' ? 'readonly' : '';
         let inputStyle = inputMode === 'calendar' ? 'background-color: #F3F4F6; cursor: not-allowed; opacity: 0.7;' : 'border-color: var(--success); color: var(--success); font-weight: bold;';
         let inputAbsenStyle = inputMode === 'calendar' ? 'background-color: #F3F4F6; cursor: not-allowed; opacity: 0.7;' : '';
@@ -367,7 +366,7 @@
     }
 
     function handleAbsenChange(id) {
-        if(inputMode === 'calendar') return; // Cegah ketik jika mode kalender tembus (safeguard)
+        if(inputMode === 'calendar') return; 
 
         let absen = parseFloat(document.getElementById(`absen-${id}`).value) || 0;
         if(absen < 0) absen = 0; if(absen > currentWorkDays) absen = currentWorkDays;
@@ -378,7 +377,7 @@
     }
 
     function handleMasukChange(id) {
-        if(inputMode === 'calendar') return; // Cegah ketik jika mode kalender tembus
+        if(inputMode === 'calendar') return; 
 
         let masuk = parseFloat(document.getElementById(`masuk-${id}`).value) || 0;
         if(masuk < 0) masuk = 0; if(masuk > currentWorkDays) masuk = currentWorkDays;
@@ -392,8 +391,8 @@
         const emp = employees.find(e => e.id == id);
         if(!emp) return;
         
-        emp.currentAbsen = absen; // Simpan ke memory
-        localStorage.setItem('employees', JSON.stringify(employees)); // Permanenkan simpanan manual
+        emp.currentAbsen = absen; 
+        localStorage.setItem('employees', JSON.stringify(employees)); 
         
         let gajiDiterima = 0;
         if(currentWorkDays > 0) gajiDiterima = Math.round((emp.salary / currentWorkDays) * masuk);
@@ -412,7 +411,6 @@
         document.getElementById('grandTotal').innerText = formatRupiah(total);
     }
 
-    // --- KALENDER ABSENSI ---
     function openCalendarModal() {
         const picker = document.getElementById('monthPicker').value;
         const [year, month] = picker.split('-');
@@ -508,7 +506,7 @@
     }
 
     function syncAbsenceFromCalendar() {
-        if(inputMode !== 'calendar') return; // Hanya sinkron kalau sedang mode kalender
+        if(inputMode !== 'calendar') return; 
 
         const picker = document.getElementById('monthPicker').value; 
         
@@ -531,11 +529,10 @@
                 }
             }
         }
-        localStorage.setItem('employees', JSON.stringify(employees)); // Permanenkan state
+        localStorage.setItem('employees', JSON.stringify(employees)); 
         renderTable();
     }
 
-    // --- CRUD ---
     function exportData() {
         const backupData = { employees: employees, attendanceData: attendanceData, monthSettings: monthSettings };
         const dataStr = JSON.stringify(backupData, null, 2);
