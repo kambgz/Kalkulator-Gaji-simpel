@@ -127,6 +127,7 @@
     <span id="syncText">Data Tersinkronisasi</span>
 </div>
 
+<!-- HALAMAN UTAMA ADMIN -->
 <div class="container" id="adminView" style="display: none;">
     <div class="header">
         <h1>Sistem Penggajian Pegawai</h1>
@@ -135,6 +136,7 @@
             <button class="btn btn-secondary" onclick="exportData()">💾 Export JSON</button>
             <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📂 Import JSON</button>
             <input type="file" id="importFile" accept=".json" style="display: none" onchange="importData(event)">
+            <button class="btn btn-danger" onclick="adminLogout()" style="padding: 6px 12px; font-size: 12px;">🔒 Keluar Admin</button>
         </div>
     </div>
 
@@ -242,6 +244,18 @@
 
 <div class="footer-copyright">
     Copyright &copy; <span id="currentYear"></span> by <strong>kam_bgz</strong>. All rights reserved.
+</div>
+
+<!-- MODAL PASSWORD ADMIN -->
+<div class="modal" id="adminLoginModal">
+    <div class="modal-content" style="max-width: 380px; text-align: center;">
+        <h2 class="card-title" style="margin-bottom: 10px;">🔒 Verifikasi Admin</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Masukkan password untuk mengakses panel admin.</p>
+        <form onsubmit="verifyAdminPassword(event)">
+            <input type="password" id="adminPasswordInput" class="form-control" placeholder="Password Admin..." required style="margin-bottom: 15px; text-align: center; font-size: 16px;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 600;">Masuk Panel</button>
+        </form>
+    </div>
 </div>
 
 <!-- MODAL TAMBAH/EDIT PEGAWAI -->
@@ -398,6 +412,9 @@
     // TAUTAN API GOOGLE SHEETS ANDA
     const API_URL = 'https://script.google.com/macros/s/AKfycbzoyXAmAZPdkXxMU76E01Wpszpjd9N6Hk3826lWUViHI8-YLh9TGB37amvA4UbWyXC4Xw/exec';
 
+    // PASSWORD ADMIN (Anda bisa ubah string 'admin123' di bawah ini sesuai keinginan)
+    const ADMIN_PASSWORD = 'makmur123';
+
     let employees = [];
     let attendanceData = {}; 
     let monthSettings = {};   
@@ -415,6 +432,28 @@
 
     // INISIALISASI & AMBIL DATA DARI CLOUD
     window.onload = async () => {
+        const hash = window.location.hash;
+
+        // Jika ini link portal karyawan, langsung bypass password & muat portal
+        if (hash.startsWith('#portal=')) {
+            await fetchCloudData();
+            document.getElementById('mainLoader').style.display = 'none';
+            loadEmployeePortal(hash.replace('#portal=', ''));
+            return;
+        }
+
+        // Jika akses admin, cek apakah sudah login di sesi ini
+        if (sessionStorage.getItem('adminAuth') === 'true') {
+            await fetchCloudData();
+            document.getElementById('mainLoader').style.display = 'none';
+            initAdminPanel();
+        } else {
+            document.getElementById('mainLoader').style.display = 'none';
+            document.getElementById('adminLoginModal').classList.add('active');
+        }
+    };
+
+    async function fetchCloudData() {
         try {
             const res = await fetch(API_URL + "?t=" + Date.now(), { cache: 'no-store' });
             const data = await res.json();
@@ -433,28 +472,46 @@
                 monthlyAbsence = data.monthlyAbsence || {};
                 monthlyKasbon = data.monthlyKasbon || {};
             }
-
-            document.getElementById('mainLoader').style.display = 'none';
-
-            const hash = window.location.hash;
-            if (hash.startsWith('#portal=')) {
-                loadEmployeePortal(hash.replace('#portal=', ''));
-            } else {
-                document.getElementById('adminView').style.display = 'block';
-                updateMealLedger(); 
-                
-                const now = new Date();
-                const initPicker = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-                document.getElementById('monthPicker').value = initPicker;
-                setMode(inputMode, true); 
-                updateMonthData();
-            }
-
         } catch (error) {
             alert("Gagal terhubung ke Cloud. Pastikan koneksi internet Anda aktif!");
             document.getElementById('mainLoader').innerHTML = `<h3 style="color:var(--danger);">Koneksi Terputus</h3><p>Muat ulang halaman saat internet kembali stabil.</p>`;
         }
-    };
+    }
+
+    function verifyAdminPassword(e) {
+        e.preventDefault();
+        const pwd = document.getElementById('adminPasswordInput').value;
+        if (pwd === ADMIN_PASSWORD) {
+            sessionStorage.setItem('adminAuth', 'true');
+            document.getElementById('adminLoginModal').classList.remove('active');
+            document.getElementById('mainLoader').style.display = 'flex';
+            document.getElementById('mainLoader').innerHTML = `<div class="spinner"></div><h3 style="margin-top:20px; color:var(--primary); font-weight: 600;">Memuat Panel Admin...</h3>`;
+            
+            fetchCloudData().then(() => {
+                document.getElementById('mainLoader').style.display = 'none';
+                initAdminPanel();
+            });
+        } else {
+            alert("Password Salah! Silakan coba lagi.");
+            document.getElementById('adminPasswordInput').value = '';
+        }
+    }
+
+    function adminLogout() {
+        sessionStorage.removeItem('adminAuth');
+        window.location.reload();
+    }
+
+    function initAdminPanel() {
+        document.getElementById('adminView').style.display = 'block';
+        updateMealLedger(); 
+        
+        const now = new Date();
+        const initPicker = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+        document.getElementById('monthPicker').value = initPicker;
+        setMode(inputMode, true); 
+        updateMonthData();
+    }
 
     // SISTEM AUTO-SAVE KE CLOUD
     let syncTimer;
@@ -1090,7 +1147,6 @@
                 if (data.monthlyAbsence) { monthlyAbsence = data.monthlyAbsence; }
                 if (data.monthlyKasbon) { monthlyKasbon = data.monthlyKasbon; }
                 
-                // Sinkronisasi data import langsung ke Cloud!
                 updateMealLedger();
                 scheduleSync(); 
                 
