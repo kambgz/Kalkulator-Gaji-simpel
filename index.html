@@ -668,46 +668,12 @@
     function initAdminPanel() {
         document.getElementById('adminView').style.display = 'block';
         document.getElementById('cloudStatus').style.display = 'flex';
-        updateMealLedger(); 
         
         const now = new Date();
         const initPicker = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
         document.getElementById('monthPicker').value = initPicker;
         setMode(inputMode, true); 
         updateMonthData();
-    }
-
-    function updateMealLedger() {
-        let updated = false;
-        let todayStr = getTodayStr();
-        let todayDate = new Date(todayStr);
-
-        employees.forEach(emp => {
-            if (!emp.dailyRates) { emp.dailyRates = {}; updated = true; }
-            if (!emp.mealStartDate) { emp.mealStartDate = `${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2,'0')}-01`; updated = true; }
-            if (!emp.mealEndDate) { emp.mealEndDate = `${new Date().getFullYear()}-12-31`; updated = true; }
-
-            let startDate = new Date(emp.mealStartDate);
-            let endDate = new Date(emp.mealEndDate);
-            let scanEnd = endDate < todayDate ? endDate : todayDate;
-            let d = new Date(startDate);
-            
-            while (d <= scanEnd) {
-                if (d.getDay() !== 0) {
-                    let y = d.getFullYear();
-                    let m = (d.getMonth() + 1).toString().padStart(2, '0');
-                    let day = d.getDate().toString().padStart(2, '0');
-                    let localDateStr = `${y}-${m}-${day}`;
-
-                    if (emp.dailyRates[localDateStr] === undefined) {
-                        emp.dailyRates[localDateStr] = emp.mealRate || 0;
-                        updated = true;
-                    }
-                }
-                d.setDate(d.getDate() + 1);
-            }
-        });
-        if (updated) scheduleSync();
     }
 
     function setMode(mode, isInit = false) {
@@ -779,6 +745,7 @@
         return bersih < 0 ? 0 : bersih;
     }
 
+    // Uang makan kini HANYA diambil murni dari Mode Kalender
     function getMealBalance(empId) {
         const emp = employees.find(e => e.id == empId);
         if (!emp || !emp.mealStartDate || !emp.mealEndDate) return 0;
@@ -790,55 +757,39 @@
         
         let totalEarned = 0;
         let d = new Date(startDate);
-        let monthWorkDays = {}; 
+        const dayRate = emp.mealRate || 0;
         
         while (d <= scanEnd) {
-            if (d.getDay() !== 0) {
+            if (d.getDay() !== 0) { // Bukan hari Minggu
                 let y = d.getFullYear();
                 let m = (d.getMonth() + 1).toString().padStart(2, '0');
                 let day = d.getDate().toString().padStart(2, '0');
                 let localDateStr = `${y}-${m}-${day}`;
-                let monthStr = `${y}-${m}`;
 
-                let dayRate = emp.dailyRates[localDateStr] || 0;
+                let absenVal = 0;
+                let isLibur = false;
+                let daily = attendanceData[localDateStr];
                 
-                if (inputMode === 'calendar') {
-                    let absenVal = 0;
-                    let isLibur = false;
-                    let daily = attendanceData[localDateStr];
-                    if (daily) {
-                        if (Array.isArray(daily)) { 
-                            if (daily.includes(emp.id)) absenVal = 1; 
-                        } else { 
-                            let val = daily[emp.id];
-                            if (val === 'libur') {
-                                isLibur = true;
-                            } else if (val !== undefined) {
-                                absenVal = val;
-                            }
+                if (daily) {
+                    if (Array.isArray(daily)) { 
+                        if (daily.includes(emp.id)) absenVal = 1; 
+                    } else { 
+                        let val = daily[emp.id];
+                        if (val === 'libur') {
+                            isLibur = true; // Libur: uang makan off (tidak dihitung)
+                        } else if (val !== undefined) {
+                            absenVal = val;
                         }
                     }
-                    if (!isLibur) {
-                        totalEarned += (1 - absenVal) * dayRate;
-                    }
-                } else {
-                    if (!monthWorkDays[monthStr]) monthWorkDays[monthStr] = 0;
-                    monthWorkDays[monthStr] += dayRate;
+                }
+                
+                if (!isLibur) {
+                    totalEarned += (1 - absenVal) * dayRate;
                 }
             }
             d.setDate(d.getDate() + 1);
         }
-
-        if (inputMode === 'manual') {
-            for (let monthStr in monthWorkDays) {
-                let abs = (monthlyAbsence[monthStr] && monthlyAbsence[monthStr][empId]) ? monthlyAbsence[monthStr][empId] : 0;
-                let earnedMonth = monthWorkDays[monthStr];
-                let deduction = abs * (emp.mealRate || 0);
-                let net = earnedMonth - deduction;
-                if (net < 0) net = 0;
-                totalEarned += net;
-            }
-        }
+        
         return totalEarned - (emp.mealWithdrawn || 0);
     }
 
@@ -1265,18 +1216,13 @@
             employees[index].mealRate = mealRate;
             employees[index].mealStartDate = mealStartDate;
             employees[index].mealEndDate = mealEndDate;
-            
-            let todayStr = getTodayStr();
-            if (employees[index].dailyRates) {
-                for (let dateStr in employees[index].dailyRates) { if (dateStr >= todayStr) employees[index].dailyRates[dateStr] = mealRate; }
-            }
         } else {
             employees.push({ 
                 id: Date.now().toString(), name: name, pin: pin, salary: salary, type: type, mealRate: mealRate,
-                mealStartDate: mealStartDate, mealEndDate: mealEndDate, mealWithdrawn: 0, dailyRates: {}
+                mealStartDate: mealStartDate, mealEndDate: mealEndDate, mealWithdrawn: 0
             });
         }
-        updateMealLedger(); 
+        scheduleSync(); 
         closeModal('employeeModal');
         renderTable();
     }
@@ -1314,7 +1260,6 @@
                 if (data.monthlyKasbon) { monthlyKasbon = data.monthlyKasbon; }
                 if (data.settingsData) { settingsData = data.settingsData; }
                 
-                updateMealLedger();
                 scheduleSync(); 
                 
                 alert("Berhasil! Data JSON telah di-import ke Cloud.");
